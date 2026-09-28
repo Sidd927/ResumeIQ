@@ -234,18 +234,39 @@ def _dedupe(items: list[str]) -> list[str]:
 # ═════════════════════════════════════════════════════════════════════════════
 
 _MONTHS = {
-    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
-    "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+    "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "apr": 4,
+    "may": 5,
+    "jun": 6,
+    "jul": 7,
+    "aug": 8,
+    "sep": 9,
+    "oct": 10,
+    "nov": 11,
+    "dec": 12,
 }
-_MONTH = r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?"
+_MONTH = (
+    r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?"
+    r"|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?"
+)
 _YEAR = r"(?:19|20)\d{2}"
-_DATE = rf"(?:{_MONTH},?\s+{_YEAR}|{_MONTH}\s*'\d{{2}}|(?:0?[1-9]|1[0-2])/{_YEAR}|{_YEAR}[-/](?:0?[1-9]|1[0-2])(?!\d)|{_YEAR})"
+_DATE = (
+    rf"(?:{_MONTH},?\s+{_YEAR}"  # Jan 2023 / January, 2023
+    rf"|{_MONTH}\s*'\d{{2}}"  # Jan '23
+    rf"|(?:0?[1-9]|1[0-2])/{_YEAR}"  # 01/2023
+    rf"|{_YEAR}[-/](?:0?[1-9]|1[0-2])(?!\d)"  # 2023-01
+    rf"|{_YEAR})"  # 2023
+)
 _PRESENT = r"(?:present|current(?:ly)?|now|ongoing|today|till date|to date|date)"
 DATE_RANGE_RE = re.compile(
     rf"(?<![\w/])(?P<start>{_DATE})\s*(?:-|–|—|to|until|till)\s*(?P<end>{_DATE}|{_PRESENT})(?![\w/])",
     re.IGNORECASE,
 )
-SINGLE_DATE_RE = re.compile(rf"(?<![\w/])(?:{_MONTH},?\s+{_YEAR}|{_YEAR}[-/](?:0?[1-9]|1[0-2])(?!\d))(?![\w/])", re.IGNORECASE)
+SINGLE_DATE_RE = re.compile(
+    rf"(?<![\w/])(?:{_MONTH},?\s+{_YEAR}|{_YEAR}[-/](?:0?[1-9]|1[0-2])(?!\d))(?![\w/])", re.IGNORECASE
+)
 _YEAR_RE = re.compile(rf"(?<!\d){_YEAR}(?!\d)")
 
 
@@ -298,29 +319,100 @@ def _date_sort_key(value: str | None, *, missing: str) -> str:
 # ═════════════════════════════════════════════════════════════════════════════
 
 RESUME_SECTIONS: dict[str, frozenset[str]] = {
-    "summary": frozenset({"summary", "professional summary", "profile", "professional profile", "about me", "about", "objective", "career objective", "career summary"}),
-    "experience": frozenset({
-        "experience", "work experience", "professional experience", "work history", "employment",
-        "employment history", "career history", "relevant experience", "internships", "internship",
-        "experience & internships", "internship experience", "industry experience", "work",
-    }),
-    "education": frozenset({
-        "education", "academic background", "academics", "academic qualifications", "qualifications",
-        "education & training", "education and training", "educational qualifications", "academic details",
-    }),
-    "skills": frozenset({
-        "skills", "technical skills", "core skills", "key skills", "skills & tools", "skills and tools",
-        "technologies", "tech stack", "core competencies", "competencies", "tools", "tools & technologies",
-        "technical proficiencies", "skill set", "skillset", "skills & technologies", "technical expertise",
-        "programming languages", "languages & frameworks",
-    }),
-    "projects": frozenset({"projects", "personal projects", "academic projects", "key projects", "selected projects", "side projects"}),
-    "certifications": frozenset({"certifications", "certificates", "licenses & certifications", "courses", "certifications & courses"}),
-    "other": frozenset({
-        "achievements", "awards", "honors", "honours", "publications", "languages", "interests", "hobbies",
-        "volunteering", "volunteer experience", "extracurricular activities", "activities", "references",
-        "leadership", "positions of responsibility", "awards & achievements", "additional information",
-    }),
+    "summary": frozenset(
+        {
+            "summary",
+            "professional summary",
+            "profile",
+            "professional profile",
+            "about me",
+            "about",
+            "objective",
+            "career objective",
+            "career summary",
+        }
+    ),
+    "experience": frozenset(
+        {
+            "experience",
+            "work experience",
+            "professional experience",
+            "work history",
+            "employment",
+            "employment history",
+            "career history",
+            "relevant experience",
+            "internships",
+            "internship",
+            "experience & internships",
+            "internship experience",
+            "industry experience",
+            "work",
+        }
+    ),
+    "education": frozenset(
+        {
+            "education",
+            "academic background",
+            "academics",
+            "academic qualifications",
+            "qualifications",
+            "education & training",
+            "education and training",
+            "educational qualifications",
+            "academic details",
+        }
+    ),
+    "skills": frozenset(
+        {
+            "skills",
+            "technical skills",
+            "core skills",
+            "key skills",
+            "skills & tools",
+            "skills and tools",
+            "technologies",
+            "tech stack",
+            "core competencies",
+            "competencies",
+            "tools",
+            "tools & technologies",
+            "technical proficiencies",
+            "skill set",
+            "skillset",
+            "skills & technologies",
+            "technical expertise",
+            "programming languages",
+            "languages & frameworks",
+        }
+    ),
+    "projects": frozenset(
+        {"projects", "personal projects", "academic projects", "key projects", "selected projects", "side projects"}
+    ),
+    "certifications": frozenset(
+        {"certifications", "certificates", "licenses & certifications", "courses", "certifications & courses"}
+    ),
+    "other": frozenset(
+        {
+            "achievements",
+            "awards",
+            "honors",
+            "honours",
+            "publications",
+            "languages",
+            "interests",
+            "hobbies",
+            "volunteering",
+            "volunteer experience",
+            "extracurricular activities",
+            "activities",
+            "references",
+            "leadership",
+            "positions of responsibility",
+            "awards & achievements",
+            "additional information",
+        }
+    ),
 }
 
 _TITLE_WORD_RE = re.compile(
@@ -482,7 +574,9 @@ def parse_work_history(lines: list[str]) -> list[dict[str, Any]]:
         title, company = _split_title_company(d.header)
         if not (title or company) and not d.bullets:
             continue
-        roles.append({"title": title, "company": company, "start_date": d.start, "end_date": d.end, "bullets": d.bullets})
+        roles.append(
+            {"title": title, "company": company, "start_date": d.start, "end_date": d.end, "bullets": d.bullets}
+        )
 
     # Most recent first: ongoing roles, then by end date, then by start date.
     roles.sort(
@@ -506,7 +600,9 @@ _DEGREE_RE = re.compile(
     re.IGNORECASE,
 )
 _DEGREE_ABBR_RE = re.compile(r"\b(?:BS|MS|BA|MA|BE|ME|BEng|MEng)\b")  # case-sensitive on purpose
-_INSTITUTION_RE = re.compile(r"\b(?:university|college|institute|school|academy|polytechnic|iit|nit|iiit|bits)\b", re.IGNORECASE)
+_INSTITUTION_RE = re.compile(
+    r"\b(?:university|college|institute|school|academy|polytechnic|iit|nit|iiit|bits)\b", re.IGNORECASE
+)
 _GPA_RE = re.compile(r"\(?\b(?:c?gpa|cpi|grade|percentage)\b\s*[:\-]?\s*[\d.]+\s*(?:/\s*[\d.]+|%)?\)?", re.IGNORECASE)
 
 
@@ -634,32 +730,107 @@ def parse_resume(file_bytes: bytes, filename: str, taxonomy: Taxonomy | None = N
 # ═════════════════════════════════════════════════════════════════════════════
 
 JD_SECTIONS: dict[str, frozenset[str]] = {
-    "required": frozenset({
-        "requirements", "required", "required skills", "required qualifications", "minimum qualifications",
-        "basic qualifications", "qualifications", "must have", "must haves", "must-have", "must-haves",
-        "what you'll need", "what you will need", "what we're looking for", "what we are looking for",
-        "you have", "who you are", "skills", "key skills", "technical skills", "your skills",
-        "skills & experience", "skills and experience", "experience", "what you bring", "you should have",
-        "requirements & skills", "tech stack", "our stack", "about you",
-    }),
-    "preferred": frozenset({
-        "preferred", "preferred skills", "preferred qualifications", "nice to have", "nice-to-have",
-        "nice to haves", "nice-to-haves", "bonus", "bonus points", "good to have", "pluses", "plus",
-        "it's a plus", "extra credit", "desired skills", "desirable", "bonus skills",
-    }),
-    "responsibilities": frozenset({
-        "responsibilities", "key responsibilities", "what you'll do", "what you will do", "the role", "your role",
-        "duties", "role", "day to day", "what you'll be doing", "job description", "about the role",
-        "in this role", "in this role you will", "your responsibilities", "the job",
-    }),
-    "other": frozenset({
-        "about us", "about the company", "who we are", "benefits", "perks", "what we offer", "why join us",
-        "compensation", "how to apply", "location", "salary", "equal opportunity", "our values", "the team",
-    }),
+    "required": frozenset(
+        {
+            "requirements",
+            "required",
+            "required skills",
+            "required qualifications",
+            "minimum qualifications",
+            "basic qualifications",
+            "qualifications",
+            "must have",
+            "must haves",
+            "must-have",
+            "must-haves",
+            "what you'll need",
+            "what you will need",
+            "what we're looking for",
+            "what we are looking for",
+            "you have",
+            "who you are",
+            "skills",
+            "key skills",
+            "technical skills",
+            "your skills",
+            "skills & experience",
+            "skills and experience",
+            "experience",
+            "what you bring",
+            "you should have",
+            "requirements & skills",
+            "tech stack",
+            "our stack",
+            "about you",
+        }
+    ),
+    "preferred": frozenset(
+        {
+            "preferred",
+            "preferred skills",
+            "preferred qualifications",
+            "nice to have",
+            "nice-to-have",
+            "nice to haves",
+            "nice-to-haves",
+            "bonus",
+            "bonus points",
+            "good to have",
+            "pluses",
+            "plus",
+            "it's a plus",
+            "extra credit",
+            "desired skills",
+            "desirable",
+            "bonus skills",
+        }
+    ),
+    "responsibilities": frozenset(
+        {
+            "responsibilities",
+            "key responsibilities",
+            "what you'll do",
+            "what you will do",
+            "the role",
+            "your role",
+            "duties",
+            "role",
+            "day to day",
+            "what you'll be doing",
+            "job description",
+            "about the role",
+            "in this role",
+            "in this role you will",
+            "your responsibilities",
+            "the job",
+        }
+    ),
+    "other": frozenset(
+        {
+            "about us",
+            "about the company",
+            "who we are",
+            "benefits",
+            "perks",
+            "what we offer",
+            "why join us",
+            "compensation",
+            "how to apply",
+            "location",
+            "salary",
+            "equal opportunity",
+            "our values",
+            "the team",
+        }
+    ),
 }
 
-_PREFERRED_CUE_RE = re.compile(r"\b(?:nice to have|a plus|is a bonus|bonus|preferred|desirable|good to have|would be great)\b", re.IGNORECASE)
-_TITLE_PREFIX_RE = re.compile(r"^(?:job title|position|role|title|we're hiring|we are hiring|hiring)\s*[:\-]\s*", re.IGNORECASE)
+_PREFERRED_CUE_RE = re.compile(
+    r"\b(?:nice to have|a plus|is a bonus|bonus|preferred|desirable|good to have|would be great)\b", re.IGNORECASE
+)
+_TITLE_PREFIX_RE = re.compile(
+    r"^(?:job title|position|role|title|we're hiring|we are hiring|hiring)\s*[:\-]\s*", re.IGNORECASE
+)
 _EXPERIENCE_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"(\d{1,2})\s*(?:-|–|to)\s*(\d{1,2})\s*\+?\s*(?:years?|yrs?)", re.IGNORECASE), "{0}-{1} years"),
     (re.compile(r"(\d{1,2})\s*\+\s*(?:years?|yrs?)", re.IGNORECASE), "{0}+ years"),
@@ -728,13 +899,9 @@ def parse_job_description(raw_text: str, taxonomy: Taxonomy | None = None) -> di
 
     # Requirement lines for semantic matching: bullets first, then prose.
     source = sections.get("responsibilities", []) + required_lines
-    requirements = [
-        _strip_bullet(line)[1] for line in source if _BULLET_RE.match(line) and len(line.split()) >= 4
-    ]
+    requirements = [_strip_bullet(line)[1] for line in source if _BULLET_RE.match(line) and len(line.split()) >= 4]
     if not requirements:
-        requirements = [
-            _strip_bullet(line)[1] for line in (source or lines[1:]) if len(line.split()) >= 5
-        ]
+        requirements = [_strip_bullet(line)[1] for line in (source or lines[1:]) if len(line.split()) >= 5]
     if not requirements:
         sentences = re.split(r"(?<=[.!?])\s+", " ".join(lines))
         requirements = [s.strip() for s in sentences if len(s.split()) >= 6]

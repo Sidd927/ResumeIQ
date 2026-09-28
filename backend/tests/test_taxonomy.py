@@ -81,7 +81,10 @@ class TestExtractFromText:
         assert taxonomy.extract_from_text("Shipped a React Native app") == ["React Native"]
 
     def test_hyphenated_variants_match(self, taxonomy):
-        assert taxonomy.extract_from_text("Applied machine-learning and CI/CD practices") == ["Machine Learning", "CI/CD"]
+        assert taxonomy.extract_from_text("Applied machine-learning and CI/CD practices") == [
+            "Machine Learning",
+            "CI/CD",
+        ]
 
 
 def test_taxonomy_file_is_consistent():
@@ -93,4 +96,4 @@ def test_taxonomy_file_is_consistent():
             key = alias.lower()
             assert seen.setdefault(key, entry["canonical"]) == entry["canonical"], f"{alias!r} is ambiguous"
     assert len(data["skills"]) >= 80
-    assert AMBIGUOUS_TEXT_ALIASES <= set(seen), "ambiguous-alias list references unknown aliases"
+    assert set(seen) >= AMBIGUOUS_TEXT_ALIASES, "ambiguous-alias list references unknown aliases"

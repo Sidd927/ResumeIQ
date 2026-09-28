@@ -32,15 +32,26 @@ def test_full_flow(client, auth_headers, fixture_bytes, sample_jd_text):
     assert r.status_code == 201, r.text
     match = r.json()
     assert set(match) == {
-        "id", "resume_id", "jd_id", "skill_score", "semantic_score", "recency_score",
-        "completeness_score", "composite_score", "missing_skills", "feedback_text", "created_at",
+        "id",
+        "resume_id",
+        "jd_id",
+        "skill_score",
+        "semantic_score",
+        "recency_score",
+        "completeness_score",
+        "composite_score",
+        "missing_skills",
+        "feedback_text",
+        "created_at",
     }
     assert match["resume_id"] == resume["id"] and match["jd_id"] == job["id"]
     assert match["missing_skills"] == ["Node.js", "AWS", "Redis", "GraphQL", "Kubernetes"]
     assert match["completeness_score"] == 1.0
     expected = (
-        0.4 * match["skill_score"] + 0.3 * match["semantic_score"]
-        + 0.2 * match["recency_score"] + 0.1 * match["completeness_score"]
+        0.4 * match["skill_score"]
+        + 0.3 * match["semantic_score"]
+        + 0.2 * match["recency_score"]
+        + 0.1 * match["completeness_score"]
     ) * 100
     assert match["composite_score"] == pytest.approx(expected, abs=0.005)
     assert 50 < match["composite_score"] < 90  # a realistic, decent-but-not-perfect match

@@ -78,7 +78,9 @@ POST   /api/auth/register        → { email, password } → { user }
 POST   /api/auth/login            → { email, password } → { access_token, refresh_token }
 POST   /api/auth/refresh          → { refresh_token }   → { access_token }
 POST   /api/resumes               → multipart file      → { resume_id, parsed_json }
+GET    /api/resumes/{id}          → { resume }  (owner only; 404 otherwise)
 POST   /api/jobs                  → { raw_text }         → { job_id, parsed_json }
+GET    /api/jobs/{id}             → { job_description }  (owner only; 404 otherwise)
 POST   /api/match                 → { resume_id, job_id }→ { match_result with 4 sub-scores }
 GET    /api/match/{id}            → { match_result }
 GET    /api/match/history         → [ match_results ]

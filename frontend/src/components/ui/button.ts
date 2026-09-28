@@ -11,7 +11,8 @@ const base =
   'motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0 motion-safe:active:scale-[0.98]';
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/25',
+  primary:
+    'bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/25',
   secondary: 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 shadow-sm hover:bg-gray-50 hover:ring-gray-400',
   ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
   link: 'text-blue-600 hover:bg-blue-50 hover:text-blue-700',
@@ -29,11 +30,7 @@ const sizes: Record<ButtonSize, string> = {
  * Shared button styling. A class helper (rather than a polymorphic <Button>)
  * lets the same look apply to <button>, <Link> and <a> with full native typing.
  */
-export function buttonClasses(
-  variant: ButtonVariant = 'primary',
-  size: ButtonSize = 'md',
-  extra?: string,
-): string {
+export function buttonClasses(variant: ButtonVariant = 'primary', size: ButtonSize = 'md', extra?: string): string {
   return cn(base, variants[variant], sizes[size], extra);
 }
 

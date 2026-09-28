@@ -9,7 +9,7 @@ the RFC 7519 requirement that the subject claim be a string.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
 import bcrypt
@@ -52,7 +52,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 def _encode(payload: dict[str, Any], lifetime: timedelta) -> str:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     claims = {**payload, "iat": now, "exp": now + lifetime}
     return jwt.encode(claims, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 

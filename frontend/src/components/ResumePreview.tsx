@@ -42,7 +42,10 @@ function AccordionSection({
       <div
         id={panelId}
         aria-hidden={!open}
-        className={cn('grid transition-[grid-template-rows] duration-300 ease-out', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}
+        className={cn(
+          'grid transition-[grid-template-rows] duration-300 ease-out',
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+        )}
       >
         <div className="overflow-hidden">
           <div className="px-6 pb-5">{children}</div>
@@ -56,7 +59,9 @@ function Field({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="min-w-0">
       <dt className="text-xs text-gray-500">{label}</dt>
-      <dd className={cn('truncate text-sm', value ? 'text-gray-900' : 'italic text-gray-400')}>{value ?? 'Not found'}</dd>
+      <dd className={cn('truncate text-sm', value ? 'text-gray-900' : 'italic text-gray-400')}>
+        {value ?? 'Not found'}
+      </dd>
     </div>
   );
 }
@@ -117,7 +122,10 @@ export default function ResumePreview({ resume, className }: { resume: ParsedRes
         <AccordionSection title="Education" meta={`${education.length}`}>
           <ul className="space-y-3">
             {education.map((ed) => (
-              <li key={`${ed.institution}-${ed.degree}`} className="flex flex-wrap items-baseline justify-between gap-x-3">
+              <li
+                key={`${ed.institution}-${ed.degree}`}
+                className="flex flex-wrap items-baseline justify-between gap-x-3"
+              >
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{ed.degree ?? ed.institution}</p>
                   {ed.degree && ed.institution && <p className="text-sm text-gray-600">{ed.institution}</p>}

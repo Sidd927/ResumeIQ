@@ -1,4 +1,10 @@
-import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import {
+  AxiosError,
+  AxiosHeaders,
+  type AxiosAdapter,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { globalToast } from '../components/ui/toastContext';
@@ -90,7 +96,9 @@ describe('token refresh', () => {
     const fresh = token('access', 600, '-new');
     const { client, calls } = fakeServer((call) => {
       if (call.url === '/api/auth/refresh') return { status: 200, data: { access_token: fresh, token_type: 'bearer' } };
-      return call.auth === `Bearer ${fresh}` ? { status: 200, data: ['ok'] } : { status: 401, data: { detail: 'expired' } };
+      return call.auth === `Bearer ${fresh}`
+        ? { status: 200, data: ['ok'] }
+        : { status: 401, data: { detail: 'expired' } };
     });
 
     await expect(client.get<string[]>('/api/match/history')).resolves.toEqual(['ok']);
@@ -165,7 +173,10 @@ describe('error normalisation', () => {
   });
 
   it("uses FastAPI's string detail as the message", async () => {
-    const { client } = fakeServer(() => ({ status: 409, data: { detail: 'An account with this email already exists' } }));
+    const { client } = fakeServer(() => ({
+      status: 409,
+      data: { detail: 'An account with this email already exists' },
+    }));
     const error = await client.post('/api/auth/register', {}, { skipAuth: true }).catch((e: unknown) => e);
     expect(error).toMatchObject({ status: 409, message: 'An account with this email already exists' });
   });
@@ -176,7 +187,9 @@ describe('error normalisation', () => {
       { loc: ['body', 'email'], msg: 'value is not a valid email address', type: 'value_error' },
     ];
     const { client } = fakeServer(() => ({ status: 422, data: { detail } }));
-    const error = (await client.post('/api/auth/register', {}, { skipAuth: true }).catch((e: unknown) => e)) as ApiError;
+    const error = (await client
+      .post('/api/auth/register', {}, { skipAuth: true })
+      .catch((e: unknown) => e)) as ApiError;
     expect(error.status).toBe(422);
     expect(error.fieldErrors).toEqual({
       password: 'Should have at least 8 characters',
@@ -185,7 +198,13 @@ describe('error normalisation', () => {
   });
 
   it('hides server internals on 5xx', () => {
-    const response = { status: 500, statusText: '', data: { detail: 'Traceback …' }, headers: {}, config: {} } as AxiosResponse;
+    const response = {
+      status: 500,
+      statusText: '',
+      data: { detail: 'Traceback …' },
+      headers: {},
+      config: {},
+    } as AxiosResponse;
     const err = toApiError(new AxiosError('x', 'ERR_BAD_RESPONSE', undefined, null, response));
     expect(err.message).not.toContain('Traceback');
   });

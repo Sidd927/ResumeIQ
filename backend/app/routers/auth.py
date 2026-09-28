@@ -1,8 +1,11 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user import AccessTokenResponse, TokenRefresh, TokenResponse, UserCreate, UserLogin, UserResponse
@@ -15,6 +18,9 @@ from app.services.auth import (
     user_id_from_payload,
     verify_password,
 )
+from app.services.rate_limit import rate_limit
+
+logger = logging.getLogger("resumeiq.auth")
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -23,7 +29,12 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 _BAD_CREDENTIALS = "Invalid email or password"
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(rate_limit("register", settings.register_rate_limit_per_minute))],
+)
 def register(payload: UserCreate, db: Session = Depends(get_db)) -> User:
     """Create an account. Emails are case-insensitive and must be unique (409 if taken)."""
     if db.scalar(select(User).where(User.email == payload.email)) is not None:
@@ -36,15 +47,22 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> User:
         db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "An account with this email already exists") from exc
     db.refresh(user)
+    logger.info("event=user_registered user_id=%s", user.id)
     return user
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    dependencies=[Depends(rate_limit("login", settings.login_rate_limit_per_minute))],
+)
 def login(payload: UserLogin, db: Session = Depends(get_db)) -> TokenResponse:
     """Exchange email + password for an access token (short-lived) and a refresh token."""
     user = db.scalar(select(User).where(User.email == payload.email))
     if user is None or not verify_password(payload.password, user.password_hash):
+        logger.info("event=login_failed known_user=%s", user is not None)
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, _BAD_CREDENTIALS)
+    logger.info("event=user_login user_id=%s", user.id)
     return TokenResponse(
         access_token=create_access_token(user.id, user.email),
         refresh_token=create_refresh_token(user.id),

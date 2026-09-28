@@ -1,8 +1,7 @@
 import { USE_MOCK } from '../../api';
 import { ExternalLinkIcon } from '../ui/icons';
 
-// TODO: point at the real repository once it is public.
-const GITHUB_URL = 'https://github.com/';
+const GITHUB_URL = 'https://github.com/Sidd927/ResumeIQ';
 
 export default function Footer() {
   return (

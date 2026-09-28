@@ -67,10 +67,40 @@ def test_full_flow_on_postgres(pg_client, fixture_bytes, sample_jd_text):
     headers = {"Authorization": f"Bearer {token}"}
 
     resume = pg_client.post(
-        "/api/resumes", headers=headers, files={"file": ("r.pdf", fixture_bytes("sample_resume.pdf"), "application/pdf")}
+        "/api/resumes",
+        headers=headers,
+        files={"file": ("r.pdf", fixture_bytes("sample_resume.pdf"), "application/pdf")},
     ).json()
     job = pg_client.post("/api/jobs", headers=headers, json={"raw_text": sample_jd_text}).json()
     match = pg_client.post("/api/match", headers=headers, json={"resume_id": resume["id"], "job_id": job["id"]}).json()
 
     assert match["missing_skills"] == ["Node.js", "AWS", "Redis", "GraphQL", "Kubernetes"]
     assert pg_client.get("/api/match/history", headers=headers).json()[0]["id"] == match["id"]
+
+
+def test_startup_migrations_apply_and_keep_logging_alive(monkeypatch):
+    """Production startup runs `alembic upgrade head` in-process. Alembic's fileConfig()
+    would silently disable the app's loggers unless env.py opts out — guard that."""
+    if not PG_URL:
+        pytest.skip("TEST_POSTGRES_URL not set")
+    import logging
+
+    from app.config import settings
+    from app.main import run_migrations
+
+    engine = create_engine(PG_URL)
+    Base.metadata.drop_all(engine)
+    with engine.begin() as conn:
+        conn.exec_driver_sql("DROP TABLE IF EXISTS alembic_version")
+    monkeypatch.setattr(settings, "database_url", PG_URL)
+
+    run_migrations()
+
+    tables = set(inspect(engine).get_table_names())
+    assert {"users", "resumes", "job_descriptions", "match_results", "alembic_version"} <= tables
+    assert logging.getLogger("resumeiq").disabled is False
+    assert logging.getLogger("uvicorn.error").disabled is False
+    Base.metadata.drop_all(engine)
+    with engine.begin() as conn:
+        conn.exec_driver_sql("DROP TABLE IF EXISTS alembic_version")
+    engine.dispose()

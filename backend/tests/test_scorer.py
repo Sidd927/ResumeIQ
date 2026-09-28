@@ -61,7 +61,9 @@ class TestSkillMatch:
 
     def test_synonyms_match_through_taxonomy(self, taxonomy):
         # "ML", "k8s", "postgres" on the resume satisfy the canonical names in the JD.
-        score = skill_match_score(["ML", "k8s", "postgres"], ["Machine Learning", "Kubernetes", "PostgreSQL"], [], taxonomy)
+        score = skill_match_score(
+            ["ML", "k8s", "postgres"], ["Machine Learning", "Kubernetes", "PostgreSQL"], [], taxonomy
+        )
         assert score == 1.0
 
     def test_unknown_skills_compare_case_insensitively(self, taxonomy):
@@ -110,7 +112,13 @@ class TestSemanticRelevance:
 
     @pytest.mark.parametrize(
         "raw, expected",
-        [(0.0, 0.0), (SEMANTIC_FLOOR, 0.0), (SEMANTIC_CEILING, 1.0), (1.0, 1.0), ((SEMANTIC_FLOOR + SEMANTIC_CEILING) / 2, 0.5)],
+        [
+            (0.0, 0.0),
+            (SEMANTIC_FLOOR, 0.0),
+            (SEMANTIC_CEILING, 1.0),
+            (1.0, 1.0),
+            ((SEMANTIC_FLOOR + SEMANTIC_CEILING) / 2, 0.5),
+        ],
     )
     def test_calibration_is_linear_and_clamped(self, raw, expected):
         assert calibrate_similarity(raw) == pytest.approx(expected)
@@ -164,8 +172,11 @@ class TestTitleRecency:
             }
         ]
         score = title_recency_score(
-            history, "Senior Full Stack Developer", jd_skills=["React", "Node.js", "AWS", "PostgreSQL"],
-            taxonomy=taxonomy, reference_date=TODAY,
+            history,
+            "Senior Full Stack Developer",
+            jd_skills=["React", "Node.js", "AWS", "PostgreSQL"],
+            taxonomy=taxonomy,
+            reference_date=TODAY,
         )
         assert score == pytest.approx(1.0)
 
@@ -174,7 +185,14 @@ class TestTitleRecency:
 
     def test_same_skills_used_long_ago_score_lower(self, taxonomy):
         def history(end: str | None) -> list[dict]:
-            return [{"title": "Full Stack Developer", "start_date": "2016-01", "end_date": end, "bullets": ["Built React apps on AWS"]}]
+            return [
+                {
+                    "title": "Full Stack Developer",
+                    "start_date": "2016-01",
+                    "end_date": end,
+                    "bullets": ["Built React apps on AWS"],
+                }
+            ]
 
         kwargs = {"jd_skills": ["React", "AWS"], "taxonomy": taxonomy, "reference_date": TODAY}
         recent = title_recency_score(history(None), "Full Stack Developer", **kwargs)
@@ -192,9 +210,16 @@ class TestTitleRecency:
         assert score < 0.75
 
     def test_depends_on_reference_date_not_wall_clock(self, taxonomy, sample_parsed_resume, sample_parsed_jd):
-        args = (sample_parsed_resume["work_history"], sample_parsed_jd["title"], sample_parsed_jd["required_skills"], taxonomy)
+        args = (
+            sample_parsed_resume["work_history"],
+            sample_parsed_jd["title"],
+            sample_parsed_jd["required_skills"],
+            taxonomy,
+        )
         assert title_recency_score(*args, reference_date=TODAY) == title_recency_score(*args, reference_date=TODAY)
-        assert title_recency_score(*args, reference_date=date(2035, 1, 1)) < title_recency_score(*args, reference_date=TODAY)
+        assert title_recency_score(*args, reference_date=date(2035, 1, 1)) < title_recency_score(
+            *args, reference_date=TODAY
+        )
 
 
 # ════════════════════════════ completeness_score ═════════════════════════════
@@ -235,7 +260,10 @@ class TestComputeMatch:
     def test_composite_equals_weighted_sum(self, sample_parsed_resume, sample_parsed_jd, taxonomy, embedder):
         r = compute_match(sample_parsed_resume, sample_parsed_jd, taxonomy, embedder, TODAY)
         expected = (
-            0.4 * r["skill_score"] + 0.3 * r["semantic_score"] + 0.2 * r["recency_score"] + 0.1 * r["completeness_score"]
+            0.4 * r["skill_score"]
+            + 0.3 * r["semantic_score"]
+            + 0.2 * r["recency_score"]
+            + 0.1 * r["completeness_score"]
         ) * 100
         assert r["composite_score"] == pytest.approx(expected, abs=0.005)
 
@@ -248,7 +276,9 @@ class TestComputeMatch:
         expected = 0.4 * r["skill_score"] + 0.3 * 0.5 + 0.2 * r["recency_score"] + 0.1 * 1.0
         assert r["composite_score"] == round(expected * 100, 2)
 
-    def test_missing_skills_required_first_then_preferred(self, sample_parsed_resume, sample_parsed_jd, taxonomy, stub_embedder):
+    def test_missing_skills_required_first_then_preferred(
+        self, sample_parsed_resume, sample_parsed_jd, taxonomy, stub_embedder
+    ):
         r = compute_match(sample_parsed_resume, sample_parsed_jd, taxonomy, stub_embedder(0.4), TODAY)
         assert r["missing_skills"] == ["Node.js", "AWS", "Redis", "GraphQL", "Kubernetes"]
 

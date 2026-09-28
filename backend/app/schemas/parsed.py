@@ -19,7 +19,9 @@ class WorkEntry(BaseModel):
     title: str | None = None
     company: str | None = None
     start_date: str | None = Field(default=None, description='"YYYY-MM" or "YYYY"')
-    end_date: str | None = Field(default=None, description='"YYYY-MM"/"YYYY"; null = current role (if start_date is set)')
+    end_date: str | None = Field(
+        default=None, description='"YYYY-MM"/"YYYY"; null = current role (if start_date is set)'
+    )
     bullets: list[str] = Field(default_factory=list)
 
 

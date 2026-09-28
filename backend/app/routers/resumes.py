@@ -12,7 +12,7 @@ from app.schemas.resume import ResumeResponse
 from app.services.auth import get_current_user
 from app.services.parser import SUPPORTED_EXTENSIONS, ResumeParseError, extract_text, parse_resume_text
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("resumeiq.resumes")
 
 router = APIRouter(prefix="/api/resumes", tags=["resumes"])
 
@@ -38,15 +38,24 @@ def upload_resume(
         text = extract_text(data, filename)
         parsed = parse_resume_text(text)
     except ResumeParseError as exc:
+        logger.info("event=resume_rejected user_id=%s reason=%r", user.id, str(exc))
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
     except Exception as exc:  # parser bug on odd input: report, don't 500 with a trace
-        logger.exception("Unexpected error parsing %s", filename)
+        logger.exception("event=resume_parse_crash user_id=%s filename=%r", user.id, filename)
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "We couldn't parse this resume.") from exc
 
     resume = Resume(user_id=user.id, raw_text=text, parsed_json=parsed, file_url=None)
     db.add(resume)
     db.commit()
     db.refresh(resume)
+    parsed_resume = resume.parsed_json or {}
+    logger.info(
+        "event=resume_parsed resume_id=%s user_id=%s skills=%d roles=%d",
+        resume.id,
+        user.id,
+        len(parsed_resume.get("skills", [])),
+        len(parsed_resume.get("work_history", [])),
+    )
     return resume
 
 

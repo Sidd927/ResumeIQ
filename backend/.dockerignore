@@ -1,0 +1,18 @@
+# Keep the build context (and image) to what the server needs at runtime.
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+tests/
+requirements-dev.txt
+.env
+.env.*
+*.db
+*.sqlite
+*.sqlite3
+Dockerfile
+.dockerignore

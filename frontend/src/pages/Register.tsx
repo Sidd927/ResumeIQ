@@ -8,6 +8,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { ApiError } from '../api';
 import { useAuth } from '../hooks/useAuth';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useSlowHint } from '../hooks/useSlowHint';
 import { useToast } from '../hooks/useToast';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -29,6 +30,7 @@ export default function Register() {
   const [confirm, setConfirm] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const serverWaking = useSlowHint(submitting);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,7 +65,10 @@ export default function Register() {
       footer={
         <>
           Already have an account?{' '}
-          <Link to={{ pathname: '/login', search: location.search }} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+          <Link
+            to={{ pathname: '/login', search: location.search }}
+            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+          >
             Log in
           </Link>
         </>
@@ -120,6 +125,11 @@ export default function Register() {
             'Create Account'
           )}
         </button>
+        {serverWaking && (
+          <p role="status" className="animate-fade-in-up text-center text-xs leading-5 text-gray-500">
+            Waking up the server — free hosting sleeps when idle, so the first request can take up to a minute.
+          </p>
+        )}
       </form>
     </AuthLayout>
   );

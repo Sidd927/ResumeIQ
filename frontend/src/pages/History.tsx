@@ -18,7 +18,11 @@ function MiniSignalBars({ match }: { match: MatchResponse }) {
   return (
     <div className="flex h-9 items-end gap-1" role="img" aria-label={`Sub-scores: ${summary}`}>
       {SIGNALS.map((s) => (
-        <div key={s.key} className="flex h-full w-2 items-end overflow-hidden rounded-sm bg-gray-100" title={`${s.name}: ${toPercent(match[s.key])}`}>
+        <div
+          key={s.key}
+          className="flex h-full w-2 items-end overflow-hidden rounded-sm bg-gray-100"
+          title={`${s.name}: ${toPercent(match[s.key])}`}
+        >
           <div className={cn('w-full rounded-sm', s.barClass)} style={{ height: `${toPercent(match[s.key])}%` }} />
         </div>
       ))}
@@ -45,10 +49,14 @@ function HistoryCard({ match, job }: { match: MatchResponse; job: JobDescription
         {/* Score */}
         <div className="flex items-center gap-4 sm:w-48 sm:shrink-0">
           <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-gray-50 ring-1 ring-inset ring-gray-200">
-            <span className="text-base font-bold leading-none text-gray-900 tabular-nums">{match.composite_score.toFixed(1)}</span>
+            <span className="text-base font-bold leading-none text-gray-900 tabular-nums">
+              {match.composite_score.toFixed(1)}
+            </span>
             <span className="mt-0.5 text-[10px] text-gray-400">/100</span>
           </div>
-          <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold', band.textClass)}>
+          <span
+            className={cn('inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold', band.textClass)}
+          >
             <span className={cn('h-2 w-2 rounded-full', band.dotClass)} aria-hidden="true" />
             {band.label}
           </span>
@@ -58,7 +66,10 @@ function HistoryCard({ match, job }: { match: MatchResponse; job: JobDescription
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-gray-900 group-hover:text-blue-700">{title}</p>
           <p className="mt-1 text-xs text-gray-500">
-            <time dateTime={match.created_at} title={`${formatDate(match.created_at)} · ${formatTime(match.created_at)}`}>
+            <time
+              dateTime={match.created_at}
+              title={`${formatDate(match.created_at)} · ${formatTime(match.created_at)}`}
+            >
               {formatRelativeTime(match.created_at)}
             </time>
             <span className="mx-1.5 text-gray-300">•</span>
@@ -97,7 +108,10 @@ export default function History() {
   useDocumentTitle('Match history');
   const { matches, jobs, loading, error, reload } = useHistory();
 
-  const best = matches.reduce<MatchResponse | null>((b, m) => (!b || m.composite_score > b.composite_score ? m : b), null);
+  const best = matches.reduce<MatchResponse | null>(
+    (b, m) => (!b || m.composite_score > b.composite_score ? m : b),
+    null,
+  );
   const average = matches.length ? matches.reduce((sum, m) => sum + m.composite_score, 0) / matches.length : 0;
 
   return (

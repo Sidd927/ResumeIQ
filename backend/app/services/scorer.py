@@ -56,14 +56,26 @@ RECENCY_HALF_LIFE_YEARS = 2.0  # older experience halves in weight every 2 years
 UNKNOWN_DATES_WEIGHT = 0.5  # role with no parseable dates: neutral evidence
 
 SENIORITY_LEVELS: dict[str, int] = {
-    "intern": 0, "internship": 0, "trainee": 0, "apprentice": 0,
-    "junior": 1, "jr": 1, "entry": 1, "graduate": 1, "associate": 1,
+    "intern": 0,
+    "internship": 0,
+    "trainee": 0,
+    "apprentice": 0,
+    "junior": 1,
+    "jr": 1,
+    "entry": 1,
+    "graduate": 1,
+    "associate": 1,
     "mid": 2,
-    "senior": 3, "sr": 3,
-    "lead": 4, "staff": 4,
-    "principal": 5, "head": 5,
-    "director": 6, "vp": 6,
-    "chief": 7, "cto": 7,
+    "senior": 3,
+    "sr": 3,
+    "lead": 4,
+    "staff": 4,
+    "principal": 5,
+    "head": 5,
+    "director": 6,
+    "vp": 6,
+    "chief": 7,
+    "cto": 7,
 }
 DEFAULT_SENIORITY = 2  # a title with no seniority word ("Software Engineer")
 UNDER_QUALIFIED_PENALTY = 0.15  # per level the candidate is below the JD
@@ -79,13 +91,22 @@ _TITLE_PHRASES: tuple[tuple[str, str], ...] = (
     (r"dev[\s-]?ops", "devops"),
 )
 _TITLE_SYNONYMS: dict[str, str] = {
-    "developer": "engineer", "programmer": "engineer", "dev": "engineer", "eng": "engineer",
-    "engineering": "engineer", "swe": "engineer", "sde": "engineer",
-    "mgr": "manager", "management": "manager",
-    "scientist": "scientist", "science": "scientist",
+    "developer": "engineer",
+    "programmer": "engineer",
+    "dev": "engineer",
+    "eng": "engineer",
+    "engineering": "engineer",
+    "swe": "engineer",
+    "sde": "engineer",
+    "mgr": "manager",
+    "management": "manager",
+    "scientist": "scientist",
+    "science": "scientist",
     "analytics": "analyst",
 }
-_TITLE_STOPWORDS = frozenset({"of", "and", "the", "a", "an", "for", "in", "to", "at", "i", "ii", "iii", "iv", "&", "-", "/"})
+_TITLE_STOPWORDS = frozenset(
+    {"of", "and", "the", "a", "an", "for", "in", "to", "at", "i", "ii", "iii", "iv", "&", "-", "/"}
+)
 
 # ── Completeness ─────────────────────────────────────────────────────────────
 COMPLETENESS_WEIGHTS: dict[str, float] = {
@@ -174,11 +195,7 @@ def _title_tokens(title: str) -> tuple[set[str], int]:
         text = re.sub(pattern, replacement, text)
     words = [w.strip(".") for w in re.findall(r"[a-z0-9+#.]+", text) if w.strip(".")]
     levels = [SENIORITY_LEVELS[w] for w in words if w in SENIORITY_LEVELS]
-    role = {
-        _TITLE_SYNONYMS.get(w, w)
-        for w in words
-        if w not in SENIORITY_LEVELS and w not in _TITLE_STOPWORDS
-    }
+    role = {_TITLE_SYNONYMS.get(w, w) for w in words if w not in SENIORITY_LEVELS and w not in _TITLE_STOPWORDS}
     return role, (max(levels) if levels else DEFAULT_SENIORITY)
 
 

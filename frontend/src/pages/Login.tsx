@@ -9,6 +9,7 @@ import { ApiError } from '../api';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useSlowHint } from '../hooks/useSlowHint';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,6 +27,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const serverWaking = useSlowHint(submitting);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -60,7 +62,10 @@ export default function Login() {
       footer={
         <>
           Don't have an account?{' '}
-          <Link to={{ pathname: '/register', search: location.search }} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+          <Link
+            to={{ pathname: '/register', search: location.search }}
+            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+          >
             Sign up
           </Link>
         </>
@@ -104,6 +109,11 @@ export default function Login() {
             'Log In'
           )}
         </button>
+        {serverWaking && (
+          <p role="status" className="animate-fade-in-up text-center text-xs leading-5 text-gray-500">
+            Waking up the server — free hosting sleeps when idle, so the first request can take up to a minute.
+          </p>
+        )}
       </form>
     </AuthLayout>
   );

@@ -86,10 +86,15 @@ export default function JobPreview({ job, missingSkills, className }: JobPreview
             className="flex w-full items-center justify-between rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           >
             {job.requirements.length} requirement{job.requirements.length === 1 ? '' : 's'} compared semantically
-            <ChevronDownIcon className={cn('h-4 w-4 text-gray-400 transition-transform', showRequirements && 'rotate-180')} />
+            <ChevronDownIcon
+              className={cn('h-4 w-4 text-gray-400 transition-transform', showRequirements && 'rotate-180')}
+            />
           </button>
           {showRequirements && (
-            <ul id={panelId} className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-6 text-gray-600 marker:text-gray-300">
+            <ul
+              id={panelId}
+              className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-6 text-gray-600 marker:text-gray-300"
+            >
               {job.requirements.map((r) => (
                 <li key={r}>{r}</li>
               ))}

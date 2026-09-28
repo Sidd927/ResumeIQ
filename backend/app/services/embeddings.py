@@ -36,7 +36,7 @@ class Embedder(Protocol):
 
 
 @lru_cache(maxsize=1)
-def load_model(model_name: str | None = None) -> "SentenceTransformer":
+def load_model(model_name: str | None = None) -> SentenceTransformer:
     """Load (once) and cache the sentence-transformer model."""
     from sentence_transformers import SentenceTransformer  # heavy import, deferred
 

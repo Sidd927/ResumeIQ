@@ -30,6 +30,7 @@ import app.models  # noqa: E402,F401 — register tables
 from app.database import Base, engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.services.embeddings import SentenceTransformerEmbedder  # noqa: E402
+from app.services.rate_limit import limiter  # noqa: E402
 from app.services.taxonomy import Taxonomy, load_taxonomy  # noqa: E402
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -40,7 +41,8 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 @pytest.fixture(autouse=True)
 def _fresh_schema() -> Iterator[None]:
-    """Every test starts with empty tables."""
+    """Every test starts with empty tables and a clean rate-limit window."""
+    limiter.reset()
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
@@ -138,8 +140,17 @@ _SAMPLE_RESUME: dict[str, Any] = {
     ],
     "education": [{"degree": "B.Tech Computer Science", "institution": "Mumbai University", "year": 2025}],
     "skills": [
-        "Python", "JavaScript", "TypeScript", "React", "FastAPI", "PostgreSQL",
-        "Docker", "Git", "REST APIs", "CI/CD", "Tailwind CSS",
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "FastAPI",
+        "PostgreSQL",
+        "Docker",
+        "Git",
+        "REST APIs",
+        "CI/CD",
+        "Tailwind CSS",
     ],
 }
 

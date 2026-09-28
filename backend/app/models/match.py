@@ -17,9 +17,7 @@ class MatchResult(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     resume_id: Mapped[int] = mapped_column(Integer, ForeignKey("resumes.id"), nullable=False)
-    jd_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("job_descriptions.id"), nullable=False
-    )
+    jd_id: Mapped[int] = mapped_column(Integer, ForeignKey("job_descriptions.id"), nullable=False)
     skill_score: Mapped[float] = mapped_column(Float, nullable=False)
     semantic_score: Mapped[float] = mapped_column(Float, nullable=False)
     recency_score: Mapped[float] = mapped_column(Float, nullable=False)
@@ -27,6 +25,4 @@ class MatchResult(Base):
     composite_score: Mapped[float] = mapped_column(Float, nullable=False)
     missing_skills: Mapped[list[str]] = mapped_column(JSONType, default=list)
     feedback_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

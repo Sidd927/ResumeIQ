@@ -83,7 +83,9 @@ function SubScoreRow({ signal, match, index }: { signal: Signal; match: MatchRes
           <div className="flex min-w-0 items-center gap-2">
             <span className={cn('h-2.5 w-2.5 shrink-0 rounded-full', signal.barClass)} aria-hidden="true" />
             <span className="truncate text-sm font-medium text-gray-900">{signal.name}</span>
-            <span className={cn('rounded-md px-1.5 py-0.5 text-[11px] font-semibold', signal.softBgClass, signal.textClass)}>
+            <span
+              className={cn('rounded-md px-1.5 py-0.5 text-[11px] font-semibold', signal.softBgClass, signal.textClass)}
+            >
               {Math.round(signal.weight * 100)}%
             </span>
           </div>
@@ -124,8 +126,7 @@ function SubScoreRow({ signal, match, index }: { signal: Signal; match: MatchRes
           <div className="px-3 pb-3 text-sm leading-6 text-gray-600">
             <p>{signal.explanation}</p>
             <p className="mt-2 text-xs text-gray-500">
-              Contributes{' '}
-              <span className="font-semibold text-gray-900 tabular-nums">{points.toFixed(1)}</span> points (
+              Contributes <span className="font-semibold text-gray-900 tabular-nums">{points.toFixed(1)}</span> points (
               {signal.weight} × {percent}) to your composite score.
             </p>
           </div>
@@ -146,7 +147,10 @@ function ContributionBar({ match }: { match: MatchResponse }) {
         {parts.map(({ signal, points }) => (
           <div
             key={signal.key}
-            className={cn('h-full border-r-2 border-white transition-[width] duration-1000 ease-out last:border-r-0', signal.barClass)}
+            className={cn(
+              'h-full border-r-2 border-white transition-[width] duration-1000 ease-out last:border-r-0',
+              signal.barClass,
+            )}
             style={{ width: mounted ? `${points}%` : '0%' }}
           />
         ))}
@@ -182,7 +186,12 @@ export default function ScoreBreakdown({ match, className }: ScoreBreakdownProps
           <h2 id="score-heading" className="sr-only">
             Score breakdown
           </h2>
-          <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset', band.badgeClass)}>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset',
+              band.badgeClass,
+            )}
+          >
             <span className={cn('h-1.5 w-1.5 rounded-full', band.dotClass)} aria-hidden="true" />
             {band.label}
           </span>

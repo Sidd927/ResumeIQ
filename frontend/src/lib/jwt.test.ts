@@ -4,11 +4,17 @@ import { decodeJwt, isJwtExpired, makeUnsignedJwt } from './jwt';
 import { safeRedirectPath } from './redirect';
 
 describe('decodeJwt', () => {
-  it('reads the payload of a real backend token (no signature check)', () => {
-    // Issued by the FastAPI backend: {"sub":"1","email":"user@example.com","type":"access",…}
+  it('reads the payload of a backend-shaped token (no signature check)', () => {
+    // Header + payload exactly as the FastAPI backend issues them; the signature
+    // is a placeholder — decoding must never depend on it.
     const backendToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc5MDU4NjYzMSwiZXhwIjoxNzkwNTg4NDMxfQ.H9zpzLLtK82mUHXvYEbUcOL7MjlKGkfeUIUGzb4G_mI';
-    expect(decodeJwt(backendToken)).toMatchObject({ sub: '1', email: 'user@example.com', type: 'access', exp: 1790588431 });
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc5MDU4NjYzMSwiZXhwIjoxNzkwNTg4NDMxfQ.not-a-real-signature';
+    expect(decodeJwt(backendToken)).toMatchObject({
+      sub: '1',
+      email: 'user@example.com',
+      type: 'access',
+      exp: 1790588431,
+    });
   });
 
   it('round-trips unicode through base64url', () => {

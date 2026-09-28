@@ -19,8 +19,7 @@ interface ResumeUploadProps {
   onChange: (resume: ResumeResponse | null) => void;
 }
 
-const ACCEPT =
-  '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const ACCEPT = '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
 /**
  * Drag-and-drop resume picker.
@@ -197,7 +196,9 @@ export default function ResumeUpload({ onChange }: ResumeUploadProps) {
         <span
           className={cn(
             'mb-3 flex h-11 w-11 items-center justify-center rounded-full transition-colors',
-            dragging ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 shadow-sm ring-1 ring-gray-200 group-hover:ring-blue-200',
+            dragging
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-blue-600 shadow-sm ring-1 ring-gray-200 group-hover:ring-blue-200',
           )}
         >
           <UploadIcon className="h-5 w-5" />
@@ -213,7 +214,15 @@ export default function ResumeUpload({ onChange }: ResumeUploadProps) {
           PDF or DOCX · up to 5 MB
         </span>
       </button>
-      <input ref={inputRef} type="file" accept={ACCEPT} onChange={onInputChange} className="sr-only" tabIndex={-1} aria-hidden="true" />
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPT}
+        onChange={onInputChange}
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       {error && (
         <p id="resume-upload-error" role="alert" className="mt-2 flex items-start gap-1.5 text-sm text-red-600">
           <AlertIcon className="mt-0.5 h-4 w-4 shrink-0" />

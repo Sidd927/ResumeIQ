@@ -36,8 +36,7 @@ export const SIGNALS: readonly Signal[] = [
     barClass: 'bg-[#2563EB]',
     softBgClass: 'bg-[#2563EB]/10',
     textClass: 'text-[#2563EB]',
-    pitch:
-      "Taxonomy-based matching with synonym awareness — 'ML' and 'Machine Learning' count as the same skill.",
+    pitch: "Taxonomy-based matching with synonym awareness — 'ML' and 'Machine Learning' count as the same skill.",
     explanation:
       'Compares the hard skills the job requires against the skills found on your resume, normalising synonyms (k8s → Kubernetes) through a curated taxonomy.',
   },
@@ -49,8 +48,7 @@ export const SIGNALS: readonly Signal[] = [
     barClass: 'bg-[#7C3AED]',
     softBgClass: 'bg-[#7C3AED]/10',
     textClass: 'text-[#7C3AED]',
-    pitch:
-      'AI embeddings compare what you wrote to what they need — meaning matters, not just keywords.',
+    pitch: 'AI embeddings compare what you wrote to what they need — meaning matters, not just keywords.',
     explanation:
       "Embeds each resume bullet and each job requirement with a sentence-transformer model, then measures how closely your experience covers what they're asking for.",
   },

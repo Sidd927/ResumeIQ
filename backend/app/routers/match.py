@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -16,6 +17,7 @@ from app.services.scorer import compute_match
 from app.services.taxonomy import Taxonomy, load_taxonomy
 
 router = APIRouter(prefix="/api/match", tags=["matching"])
+logger = logging.getLogger("resumeiq.match")
 
 
 def get_taxonomy() -> Taxonomy:
@@ -61,6 +63,13 @@ def run_match(
     db.add(result)
     db.commit()
     db.refresh(result)
+    logger.info(
+        "event=match_computed match_id=%s user_id=%s composite=%.2f missing=%d",
+        result.id,
+        user.id,
+        result.composite_score,
+        len(result.missing_skills),
+    )
     return result
 
 

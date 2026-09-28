@@ -55,7 +55,11 @@ export default function Landing() {
             Try It Now
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
-          <button type="button" onClick={scrollToHowItWorks} className={buttonClasses('secondary', 'lg', 'w-full sm:w-auto')}>
+          <button
+            type="button"
+            onClick={scrollToHowItWorks}
+            className={buttonClasses('secondary', 'lg', 'w-full sm:w-auto')}
+          >
             See How It Works
           </button>
         </div>
@@ -111,7 +115,13 @@ export default function Landing() {
               <span aria-hidden="true" className={cn('absolute inset-y-0 left-0 w-1', signal.barClass)} />
               <div className="flex items-start justify-between gap-4">
                 <h3 className="text-base font-semibold text-gray-900">{signal.name}</h3>
-                <span className={cn('rounded-md px-2 py-0.5 text-sm font-semibold tabular-nums', signal.softBgClass, signal.textClass)}>
+                <span
+                  className={cn(
+                    'rounded-md px-2 py-0.5 text-sm font-semibold tabular-nums',
+                    signal.softBgClass,
+                    signal.textClass,
+                  )}
+                >
                   {Math.round(signal.weight * 100)}%
                 </span>
               </div>

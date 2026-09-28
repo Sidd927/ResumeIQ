@@ -10,16 +10,6 @@ class MatchRequest(BaseModel):
     job_id: int
 
 
-class MatchScoreBreakdown(BaseModel):
-    skill_score: float
-    semantic_score: float
-    recency_score: float
-    completeness_score: float
-    composite_score: float
-    missing_skills: list[str]
-    feedback_text: str | None = None
-
-
 class MatchResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

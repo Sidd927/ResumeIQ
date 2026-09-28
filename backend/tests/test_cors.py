@@ -15,7 +15,8 @@ def test_preflight_allows_configured_origins(client, origin):
     )
     assert r.status_code == 200
     assert r.headers["access-control-allow-origin"] == origin
-    assert r.headers["access-control-allow-credentials"] == "true"
+    # Bearer tokens, not cookies → credentialed CORS is deliberately off.
+    assert "access-control-allow-credentials" not in r.headers
 
 
 def test_unknown_origin_is_not_allowed(client):
@@ -24,3 +25,10 @@ def test_unknown_origin_is_not_allowed(client):
         headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"},
     )
     assert "access-control-allow-origin" not in r.headers
+
+
+def test_error_responses_still_carry_cors_headers(client):
+    """A 401 must be readable by the frontend, or it shows a generic network error instead."""
+    r = client.get("/api/match/history", headers={"Origin": "http://localhost:5173"})
+    assert r.status_code == 401
+    assert r.headers["access-control-allow-origin"] == "http://localhost:5173"

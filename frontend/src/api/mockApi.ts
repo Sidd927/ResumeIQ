@@ -9,13 +9,7 @@
  * Matches and job descriptions created during a session are persisted to
  * localStorage so history survives reloads and logout/login.
  */
-import {
-  mockJobDescription,
-  mockJobDescriptions,
-  mockMatchHistory,
-  mockMatchResult,
-  mockResume,
-} from '../mocks/data';
+import { mockJobDescription, mockJobDescriptions, mockMatchHistory, mockMatchResult, mockResume } from '../mocks/data';
 import { validateResumeFile } from '../lib/files';
 import { makeUnsignedJwt } from '../lib/jwt';
 import type {
@@ -151,7 +145,11 @@ export async function getMatchHistory(): Promise<MatchResponse[]> {
 /** GET /api/jobs/{id} for each id — used for job titles and required/preferred splits. */
 export async function getJobDescriptions(ids: number[]): Promise<Record<number, JobDescriptionResponse>> {
   const wanted = new Set(ids);
-  return Object.fromEntries(allJobs().filter((j) => wanted.has(j.id)).map((j) => [j.id, j]));
+  return Object.fromEntries(
+    allJobs()
+      .filter((j) => wanted.has(j.id))
+      .map((j) => [j.id, j]),
+  );
 }
 
 /** GET /api/resumes/{id} */

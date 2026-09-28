@@ -173,7 +173,11 @@ export class ApiClient {
     return this.request<T>(endpoint, { ...options, method: 'POST', body: body ?? {} });
   }
 
-  upload<T>(endpoint: string, formData: FormData, options: Omit<RequestOptions, 'method' | 'formData'> = {}): Promise<T> {
+  upload<T>(
+    endpoint: string,
+    formData: FormData,
+    options: Omit<RequestOptions, 'method' | 'formData'> = {},
+  ): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'POST', formData });
   }
 

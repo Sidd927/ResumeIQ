@@ -17,6 +17,11 @@ import type { UploadOptions } from './types';
 
 /** The first match loads the embedding model server-side (can take ~10–30 s on a cold server). */
 const SLOW_REQUEST_TIMEOUT_MS = 120_000;
+/**
+ * Free hosting (Render) sleeps when idle; the first request after a nap can
+ * take 30–60 s while the server boots. Auth is usually that first request.
+ */
+const WAKE_UP_TIMEOUT_MS = 90_000;
 
 /** Resolve 404 → null, rethrow everything else. */
 async function orNull<T>(promise: Promise<T>): Promise<T | null> {
@@ -31,11 +36,19 @@ async function orNull<T>(promise: Promise<T>): Promise<T | null> {
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
 export function loginUser(email: string, password: string): Promise<TokenResponse> {
-  return apiClient.post<TokenResponse>('/api/auth/login', { email, password }, { skipAuth: true });
+  return apiClient.post<TokenResponse>(
+    '/api/auth/login',
+    { email, password },
+    { skipAuth: true, timeoutMs: WAKE_UP_TIMEOUT_MS },
+  );
 }
 
 export function registerUser(email: string, password: string): Promise<UserResponse> {
-  return apiClient.post<UserResponse>('/api/auth/register', { email, password }, { skipAuth: true });
+  return apiClient.post<UserResponse>(
+    '/api/auth/register',
+    { email, password },
+    { skipAuth: true, timeoutMs: WAKE_UP_TIMEOUT_MS },
+  );
 }
 
 // ── Resumes ──────────────────────────────────────────────────────────────────
@@ -84,4 +97,12 @@ export async function getMatchHistory(): Promise<MatchResponse[]> {
   const matches = await apiClient.get<MatchResponse[]>('/api/match/history');
   // The API already returns newest first; sorting again is cheap insurance.
   return [...matches].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at) || b.id - a.id);
+}
+
+/**
+ * Fire-and-forget GET /health so a sleeping free-tier backend starts booting
+ * while the visitor is still reading the landing page. Errors are ignored.
+ */
+export function wakeBackend(): void {
+  apiClient.get('/health', { skipAuth: true, timeoutMs: WAKE_UP_TIMEOUT_MS }).catch(() => undefined);
 }

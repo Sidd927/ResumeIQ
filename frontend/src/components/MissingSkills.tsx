@@ -79,7 +79,9 @@ export default function MissingSkills({ missingSkills, jobDescription, className
         <span
           className={cn(
             'rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset',
-            missingSkills.length ? 'bg-red-50 text-red-700 ring-red-600/15' : 'bg-green-50 text-green-700 ring-green-600/20',
+            missingSkills.length
+              ? 'bg-red-50 text-red-700 ring-red-600/15'
+              : 'bg-green-50 text-green-700 ring-green-600/20',
           )}
         >
           {missingSkills.length} missing
@@ -88,8 +90,15 @@ export default function MissingSkills({ missingSkills, jobDescription, className
 
       {jobDescription && (
         <p className="mt-1 text-sm text-gray-500">
-          You cover <span className="font-medium text-gray-900">{reqHave} of {reqTotal}</span> required and{' '}
-          <span className="font-medium text-gray-900">{prefHave} of {prefTotal}</span> preferred skills.
+          You cover{' '}
+          <span className="font-medium text-gray-900">
+            {reqHave} of {reqTotal}
+          </span>{' '}
+          required and{' '}
+          <span className="font-medium text-gray-900">
+            {prefHave} of {prefTotal}
+          </span>{' '}
+          preferred skills.
         </p>
       )}
 
@@ -106,8 +115,8 @@ export default function MissingSkills({ missingSkills, jobDescription, className
           </div>
           <p className="mt-6 flex items-start gap-2 border-t border-gray-100 pt-4 text-sm leading-6 text-gray-600">
             <AlertIcon className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-            Consider adding experience with these skills to improve your match score — required skills carry the
-            most weight.
+            Consider adding experience with these skills to improve your match score — required skills carry the most
+            weight.
           </p>
         </>
       )}

@@ -16,7 +16,16 @@ class TestParseJobDescription:
     def test_realistic_jd(self, sample_jd_text):
         jd = parse_job_description(sample_jd_text)
         assert jd["title"] == "Senior Full Stack Developer"
-        assert jd["required_skills"] == ["React", "TypeScript", "Node.js", "PostgreSQL", "Docker", "AWS", "CI/CD", "REST APIs"]
+        assert jd["required_skills"] == [
+            "React",
+            "TypeScript",
+            "Node.js",
+            "PostgreSQL",
+            "Docker",
+            "AWS",
+            "CI/CD",
+            "REST APIs",
+        ]
         assert jd["preferred_skills"] == ["Python", "FastAPI", "Redis", "GraphQL", "Kubernetes"]
         assert jd["experience_level"] == "3-5 years"
         assert len(jd["requirements"]) == 5
@@ -43,7 +52,9 @@ Nice to have
         assert not set(jd["required_skills"]) & set(jd["preferred_skills"])
 
     def test_minimal_jd_without_sections(self):
-        jd = parse_job_description("Python developer needed. You must know Django and have at least 2 years experience.")
+        jd = parse_job_description(
+            "Python developer needed. You must know Django and have at least 2 years experience."
+        )
         assert jd["required_skills"] == ["Python", "Django"]
         assert jd["preferred_skills"] == []
         assert jd["experience_level"] == "2+ years"
@@ -100,7 +111,9 @@ def _check_sample_resume(parsed: dict) -> None:
     assert len(roles[0]["bullets"]) == 4
     # A bullet that wrapped onto two lines is re-joined.
     assert roles[0]["bullets"][2].endswith("from 2 hours to 15 minutes")
-    assert parsed["education"] == [{"degree": "B.Tech Computer Science", "institution": "Mumbai University", "year": 2025}]
+    assert parsed["education"] == [
+        {"degree": "B.Tech Computer Science", "institution": "Mumbai University", "year": 2025}
+    ]
     skills = parsed["skills"]
     assert {"Python", "React", "FastAPI", "TailwindCSS", "Docker", "CI/CD"} <= set(skills)
     assert "Figma" in skills  # unknown to the taxonomy, kept rather than dropped

@@ -77,7 +77,12 @@ function AnalysisProgress() {
               >
                 {done ? <CheckIcon className="h-3 w-3" /> : <span className="h-1.5 w-1.5 rounded-full bg-current" />}
               </span>
-              <span className={cn('transition-colors', done ? 'text-gray-500' : active ? 'font-medium text-gray-900' : 'text-gray-400')}>
+              <span
+                className={cn(
+                  'transition-colors',
+                  done ? 'text-gray-500' : active ? 'font-medium text-gray-900' : 'text-gray-400',
+                )}
+              >
                 {label}
                 {active && '…'}
               </span>
@@ -124,13 +129,14 @@ export default function Dashboard() {
   const jdReady = jdText.trim().length >= MIN_JD_LENGTH;
   const canAnalyze = resume !== null && jdReady && phase !== 'analyzing';
 
-  const missingHint = !resume && !jdReady
-    ? 'Upload a resume and add a job description to continue.'
-    : !resume
-      ? 'Upload your resume to continue.'
-      : !jdReady
-        ? `Add a job description (${MIN_JD_LENGTH}+ characters) to continue.`
-        : null;
+  const missingHint =
+    !resume && !jdReady
+      ? 'Upload a resume and add a job description to continue.'
+      : !resume
+        ? 'Upload your resume to continue.'
+        : !jdReady
+          ? `Add a job description (${MIN_JD_LENGTH}+ characters) to continue.`
+          : null;
 
   const handleAnalyze = async () => {
     if (!resume || !jdReady) return;
@@ -209,7 +215,12 @@ export default function Dashboard() {
           {phase === 'analyzing' && <AnalysisProgress />}
 
           {phase === 'idle' && !result && (
-            <div className={cn(cardClasses, 'flex min-h-[420px] items-center justify-center border-dashed bg-white/60 shadow-none')}>
+            <div
+              className={cn(
+                cardClasses,
+                'flex min-h-[420px] items-center justify-center border-dashed bg-white/60 shadow-none',
+              )}
+            >
               <EmptyState
                 icon={<ChartIcon className="h-6 w-6" />}
                 title="Your results will appear here"

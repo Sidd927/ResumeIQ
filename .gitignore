@@ -36,4 +36,9 @@ Thumbs.db
 
 # Database
 *.db
+*.sqlite
 *.sqlite3
+
+# Test coverage output
+coverage/
+.ruff_cache/

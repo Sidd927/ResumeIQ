@@ -18,6 +18,4 @@ class Resume(Base):
     raw_text: Mapped[str] = mapped_column(Text, nullable=False)
     parsed_json: Mapped[dict[str, Any] | None] = mapped_column(JSONType, nullable=True)
     file_url: Mapped[str | None] = mapped_column(String, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
