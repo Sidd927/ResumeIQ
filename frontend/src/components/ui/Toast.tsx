@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 
 import { cn } from '../../lib/cn';
 import { AlertIcon, CheckCircleIcon, InfoIcon, XIcon } from './icons';
-import { ToastContext, type ToastApi, type ToastType } from './toastContext';
+import { registerGlobalToast, ToastContext, type ToastApi, type ToastType } from './toastContext';
 
 interface ToastItem {
   id: number;
@@ -10,7 +10,7 @@ interface ToastItem {
   type: ToastType;
 }
 
-const AUTO_DISMISS_MS = 3000;
+const AUTO_DISMISS_MS = 5000;
 
 const styles: Record<ToastType, { icon: typeof InfoIcon; iconClass: string; accent: string }> = {
   success: { icon: CheckCircleIcon, iconClass: 'text-green-600', accent: 'before:bg-green-600' },
@@ -50,7 +50,7 @@ function Toast({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: number)
   );
 }
 
-/** Global toast queue. Toasts slide in top-right and auto-dismiss after 3s. */
+/** Global toast queue. Toasts slide in top-right and auto-dismiss after 5s. */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
@@ -62,7 +62,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const api = useMemo<ToastApi>(() => {
     const show = (message: string, type: ToastType = 'info') => {
       const id = nextId.current++;
-      setToasts((current) => [...current.slice(-2), { id, message, type }]);
+      // Parallel requests failing together shouldn't stack identical toasts.
+      setToasts((current) =>
+        current.some((t) => t.message === message && t.type === type)
+          ? current
+          : [...current.slice(-2), { id, message, type }],
+      );
     };
     return {
       show,
@@ -71,6 +76,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       info: (m) => show(m, 'info'),
     };
   }, []);
+
+  useEffect(() => {
+    registerGlobalToast(api);
+    return () => registerGlobalToast(null);
+  }, [api]);
 
   return (
     <ToastContext.Provider value={api}>

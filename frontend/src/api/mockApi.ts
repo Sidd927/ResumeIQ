@@ -1,9 +1,10 @@
 /**
- * Phase 1 mock API.
+ * Mock API — in-browser demo data, no backend required.
  *
- * Function names, arguments and return types mirror the real endpoints in
- * CLAUDE.md, so Phase 3 only swaps each body for an `apiClient` call —
- * no component or page needs to change.
+ * Enabled with VITE_USE_MOCK=true (e.g. for a demo when the backend is down).
+ * Implements the same ResumeIQApi contract as api.ts, including auth: login
+ * returns UNSIGNED fake JWTs, so the auth store and route guards run the
+ * exact same code path as with the real backend.
  *
  * Matches and job descriptions created during a session are persisted to
  * localStorage so history survives reloads and logout/login.
@@ -15,15 +16,22 @@ import {
   mockMatchResult,
   mockResume,
 } from '../mocks/data';
+import { validateResumeFile } from '../lib/files';
+import { makeUnsignedJwt } from '../lib/jwt';
 import type {
   JobDescriptionCreate,
   JobDescriptionResponse,
   MatchRequest,
   MatchResponse,
   ResumeResponse,
+  TokenResponse,
+  UserResponse,
 } from '../types';
+import { ApiError } from './client';
+import type { UploadOptions } from './types';
 
 const LATENCY_MS = {
+  auth: 500,
   upload: 1500,
   job: 300,
   match: 1700,
@@ -34,9 +42,6 @@ const STORAGE_KEYS = {
   matches: 'resumeiq_mock_matches',
   jobs: 'resumeiq_mock_jobs',
 } as const;
-
-export const ACCEPTED_RESUME_EXTENSIONS = ['.pdf', '.docx'] as const;
-export const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -67,23 +72,37 @@ function nextId(items: Array<{ id: number }>): number {
   return items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
 }
 
-/** Client-side validation shared by the upload UI. Returns an error message or null. */
-export function validateResumeFile(file: File): string | null {
-  const name = file.name.toLowerCase();
-  if (!ACCEPTED_RESUME_EXTENSIONS.some((ext) => name.endsWith(ext))) {
-    return `"${file.name}" isn't supported. Upload a PDF or DOCX file.`;
-  }
-  if (file.size > MAX_RESUME_BYTES) {
-    return 'That file is larger than 5 MB. Try exporting a smaller PDF.';
-  }
-  return null;
+const MOCK_USER_ID = 1;
+const MOCK_TOKEN_LIFETIME_S = 7 * 24 * 3600;
+
+/** POST /api/auth/login — any credentials work; returns unsigned fake tokens. */
+export async function loginUser(email: string, _password: string): Promise<TokenResponse> {
+  await delay(LATENCY_MS.auth);
+  const exp = Math.floor(Date.now() / 1000) + MOCK_TOKEN_LIFETIME_S;
+  const normalized = email.trim().toLowerCase();
+  return {
+    access_token: makeUnsignedJwt({ sub: String(MOCK_USER_ID), email: normalized, type: 'access', exp }),
+    refresh_token: makeUnsignedJwt({ sub: String(MOCK_USER_ID), type: 'refresh', exp }),
+    token_type: 'bearer',
+  };
+}
+
+/** POST /api/auth/register */
+export async function registerUser(email: string, _password: string): Promise<UserResponse> {
+  await delay(LATENCY_MS.auth);
+  return { id: MOCK_USER_ID, email: email.trim().toLowerCase(), created_at: new Date().toISOString() };
 }
 
 /** POST /api/resumes */
-export async function uploadResume(file: File): Promise<ResumeResponse> {
+export async function uploadResume(file: File, options: UploadOptions = {}): Promise<ResumeResponse> {
   const error = validateResumeFile(file);
-  if (error) throw new Error(error);
-  await delay(LATENCY_MS.upload);
+  if (error) throw new ApiError(415, error);
+  // Simulated upload progress, then "parsing".
+  for (const fraction of [0.35, 0.7, 1]) {
+    await delay(LATENCY_MS.upload / 6);
+    options.onUploadProgress?.(fraction);
+  }
+  await delay(LATENCY_MS.upload / 2);
   return { ...mockResume, created_at: new Date().toISOString() };
 }
 
@@ -129,13 +148,13 @@ export async function getMatchHistory(): Promise<MatchResponse[]> {
   return allMatches().sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
 }
 
-/** Lookup used to show job titles and classify missing skills. */
+/** GET /api/jobs/{id} for each id — used for job titles and required/preferred splits. */
 export async function getJobDescriptions(ids: number[]): Promise<Record<number, JobDescriptionResponse>> {
   const wanted = new Set(ids);
   return Object.fromEntries(allJobs().filter((j) => wanted.has(j.id)).map((j) => [j.id, j]));
 }
 
-/** Resume lookup for match detail views. */
+/** GET /api/resumes/{id} */
 export async function getResume(id: number): Promise<ResumeResponse | null> {
   return id === mockResume.id ? mockResume : null;
 }

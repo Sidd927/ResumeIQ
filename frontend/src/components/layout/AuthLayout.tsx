@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { USE_MOCK } from '../../api';
 import { InfoIcon } from '../ui/icons';
 import Logo from './Logo';
 
@@ -28,10 +29,12 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
           <div className="mt-6">{children}</div>
         </main>
         <p className="mt-6 text-center text-sm text-gray-600">{footer}</p>
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
-          <InfoIcon className="h-3.5 w-3.5" />
-          Demo mode — any email and password will work.
-        </p>
+        {USE_MOCK && (
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
+            <InfoIcon className="h-3.5 w-3.5" />
+            Demo mode — any email and password will work.
+          </p>
+        )}
       </div>
     </div>
   );

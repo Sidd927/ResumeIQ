@@ -108,10 +108,20 @@ TEST_POSTGRES_URL=postgresql://… python -m pytest -m integration  # PostgreSQL
 ```bash
 cd frontend
 npm install
-npm run dev                   # → http://localhost:5173
+npm run dev                   # → http://localhost:5173 (backend must be running on :8000)
 ```
 
-Type-check: `npm run typecheck`
+In dev the app calls relative `/api/...` URLs and Vite proxies them to FastAPI, so CORS never applies locally. For a production build set `VITE_API_URL` to the backend origin and add the frontend's URL to the backend's `BACKEND_CORS_ORIGINS`.
+
+**Demo without a backend:** `VITE_USE_MOCK=true npm run dev` swaps in in-browser mock data (any email/password logs in).
+
+Checks: `npm run typecheck` · `npm run lint` · `npm test` · `npm run build`
+
+#### How auth works in the browser
+
+- Login stores the JWT pair in `localStorage`; the auth store decodes the access token's payload (never verifying it — that's the server's job) to know who is logged in, so a page refresh keeps you signed in without a `/me` call.
+- The API client attaches `Authorization: Bearer …`, refreshes an expired access token *before* sending, and on a 401 refreshes and retries **once**. Concurrent requests share one refresh.
+- If the refresh token is rejected, the session ends: tokens are cleared, you're sent to `/login?redirect=<page>` and told why. A network error never logs you out.
 
 ## Project Structure
 
@@ -143,8 +153,9 @@ resumeiq/
 └── frontend/
     ├── package.json
     └── src/
-        ├── api/               # typed axios client + JWT interceptors
+        ├── api/               # client.ts (axios + JWT refresh), api.ts (real), mockApi.ts, index.ts (toggle)
         ├── components/
+        ├── stores/            # authStore — JWT-derived session state
         ├── hooks/
         ├── pages/
         └── types/             # TS interfaces mirroring backend schemas
@@ -189,7 +200,7 @@ Each sub-score is in `[0, 1]` and implemented as an independently unit-tested fu
 - [x] **Phase 0** — Scaffold, CI, migrations
 - [x] **Phase 1** — Frontend shell with mock data
 - [x] **Phase 2** — Parsing + scoring engine + API
-- [ ] **Phase 3** — Wire frontend ↔ backend, auth, DB
+- [x] **Phase 3** — Wire frontend ↔ backend, auth, DB
 - [ ] **Phase 4** — Deploy, coverage, polish
 - [ ] **Phase 5** — Stretch: Claude feedback, bullet rewriting, trend dashboard
 

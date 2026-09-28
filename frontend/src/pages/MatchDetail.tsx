@@ -1,12 +1,13 @@
 import { Link, useParams } from 'react-router-dom';
 
+import JobPreview from '../components/JobPreview';
 import MissingSkills from '../components/MissingSkills';
 import ResumePreview from '../components/ResumePreview';
 import ScoreBreakdown from '../components/ScoreBreakdown';
 import { cardClasses } from '../components/ui/button';
 import EmptyState from '../components/ui/EmptyState';
-import { ArrowLeftIcon, SearchIcon } from '../components/ui/icons';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { AlertIcon, ArrowLeftIcon, SearchIcon } from '../components/ui/icons';
+import { MatchReportSkeleton } from '../components/ui/Skeleton';
 import { useMatch } from '../hooks/useMatch';
 import { formatDate, formatTime } from '../lib/format';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -14,7 +15,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 /** Full report for one past match: score breakdown, skills gap, parsed resume. */
 export default function MatchDetail() {
   const { id } = useParams<{ id: string }>();
-  const { report, loading, notFound } = useMatch(Number(id));
+  const { report, loading, notFound, error } = useMatch(Number(id));
   useDocumentTitle(report?.job?.parsed_json?.title ?? (notFound ? 'Match not found' : 'Match report'));
 
   const backLink = (
@@ -29,8 +30,27 @@ export default function MatchDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-blue-600">
-        <LoadingSpinner size="lg" label="Loading match report" />
+      <>
+        <span role="status" className="sr-only">
+          Loading match report
+        </span>
+        <MatchReportSkeleton />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        {backLink}
+        <div className={`${cardClasses} mt-6`}>
+          <EmptyState
+            icon={<AlertIcon className="h-6 w-6" />}
+            title="Couldn't load this match"
+            description={error}
+            action={{ label: 'Try again', onClick: () => window.location.reload() }}
+          />
+        </div>
       </div>
     );
   }
@@ -76,6 +96,7 @@ export default function MatchDetail() {
         </div>
         <div className="space-y-6 lg:col-span-5">
           <MissingSkills missingSkills={match.missing_skills} jobDescription={job?.parsed_json ?? null} />
+          {job?.parsed_json && <JobPreview job={job.parsed_json} missingSkills={match.missing_skills} />}
           {resume?.parsed_json && <ResumePreview resume={resume.parsed_json} />}
         </div>
       </div>

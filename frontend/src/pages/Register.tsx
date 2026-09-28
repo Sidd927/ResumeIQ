@@ -5,13 +5,13 @@ import AuthLayout from '../components/layout/AuthLayout';
 import { buttonClasses } from '../components/ui/button';
 import FormField from '../components/ui/FormField';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { ApiError } from '../api';
 import { useAuth } from '../hooks/useAuth';
-import { useToast } from '../hooks/useToast';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useToast } from '../hooks/useToast';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 8;
-const MOCK_AUTH_DELAY_MS = 700;
 
 interface Errors {
   email?: string;
@@ -21,7 +21,7 @@ interface Errors {
 
 export default function Register() {
   useDocumentTitle('Create account');
-  const { login } = useAuth();
+  const { register } = useAuth();
   const toast = useToast();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -40,9 +40,20 @@ export default function Register() {
     if (Object.keys(next).length) return;
 
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, MOCK_AUTH_DELAY_MS));
-    login(email);
-    toast.success('Account created — welcome to ResumeIQ!');
+    try {
+      await register(email.trim(), password);
+      // PublicOnlyRoute now redirects (to ?redirect= or /dashboard).
+      toast.success('Account created successfully');
+    } catch (err) {
+      setSubmitting(false);
+      if (err instanceof ApiError && err.status === 409) {
+        setErrors({ email: 'An account with this email already exists. Try logging in.' });
+      } else if (err instanceof ApiError && err.status === 422 && Object.keys(err.fieldErrors).length) {
+        setErrors({ email: err.fieldErrors.email, password: err.fieldErrors.password });
+      } else {
+        toast.error(err instanceof Error ? err.message : 'Could not create your account.');
+      }
+    }
   };
 
   return (
@@ -52,7 +63,7 @@ export default function Register() {
       footer={
         <>
           Already have an account?{' '}
-          <Link to="/login" state={location.state} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+          <Link to={{ pathname: '/login', search: location.search }} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
             Log in
           </Link>
         </>

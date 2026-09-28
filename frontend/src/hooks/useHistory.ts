@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { getJobDescriptions, getMatchHistory } from '../api/mockApi';
+import { getJobDescriptions, getMatchHistory } from '../api';
 import type { JobDescriptionResponse, MatchResponse } from '../types';
 
 interface HistoryState {
@@ -10,9 +10,14 @@ interface HistoryState {
   error: string | null;
 }
 
+interface UseHistory extends HistoryState {
+  reload: () => void;
+}
+
 /** Loads the user's match history (most recent first) plus the JDs it references. */
-export function useHistory(): HistoryState {
+export function useHistory(): UseHistory {
   const [state, setState] = useState<HistoryState>({ matches: [], jobs: {}, loading: true, error: null });
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +36,12 @@ export function useHistory(): HistoryState {
     return () => {
       cancelled = true;
     };
+  }, [attempt]);
+
+  const reload = useCallback(() => {
+    setState((s) => ({ ...s, loading: true, error: null }));
+    setAttempt((n) => n + 1);
   }, []);
 
-  return state;
+  return { ...state, reload };
 }

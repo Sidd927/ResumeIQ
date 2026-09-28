@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { getJobDescriptions, getMatch, getResume } from '../api/mockApi';
+import { getJobDescriptions, getMatch, getResume } from '../api';
 import type { JobDescriptionResponse, MatchResponse, ResumeResponse } from '../types';
 
 export interface MatchReport {
@@ -13,14 +13,16 @@ interface MatchState {
   report: MatchReport | null;
   loading: boolean;
   notFound: boolean;
+  error: string | null;
 }
 
 interface Loaded {
   id: number;
   report: MatchReport | null;
+  error: string | null;
 }
 
-/** Loads one match result with the JD and resume it was computed from. */
+/** Loads one match result with the JD and resume it was computed from. 404 → notFound. */
 export function useMatch(id: number): MatchState {
   // Results are tagged with the id they were loaded for, so "loading" is
   // derived during render instead of being reset inside the effect.
@@ -29,13 +31,18 @@ export function useMatch(id: number): MatchState {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const match = Number.isFinite(id) ? await getMatch(id) : null;
-      if (!match) {
-        if (!cancelled) setLoaded({ id, report: null });
-        return;
+      try {
+        const match = await getMatch(id);
+        if (!match) {
+          if (!cancelled) setLoaded({ id, report: null, error: null });
+          return;
+        }
+        const [jobs, resume] = await Promise.all([getJobDescriptions([match.jd_id]), getResume(match.resume_id)]);
+        if (!cancelled) setLoaded({ id, report: { match, job: jobs[match.jd_id] ?? null, resume }, error: null });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Could not load this match.';
+        if (!cancelled) setLoaded({ id, report: null, error: message });
       }
-      const [jobs, resume] = await Promise.all([getJobDescriptions([match.jd_id]), getResume(match.resume_id)]);
-      if (!cancelled) setLoaded({ id, report: { match, job: jobs[match.jd_id] ?? null, resume } });
     })();
     return () => {
       cancelled = true;
@@ -46,6 +53,7 @@ export function useMatch(id: number): MatchState {
   return {
     report: current?.report ?? null,
     loading: current === null,
-    notFound: current !== null && current.report === null,
+    notFound: current !== null && current.report === null && current.error === null,
+    error: current?.error ?? null,
   };
 }

@@ -5,12 +5,12 @@ import AuthLayout from '../components/layout/AuthLayout';
 import { buttonClasses } from '../components/ui/button';
 import FormField from '../components/ui/FormField';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { ApiError } from '../api';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MOCK_AUTH_DELAY_MS = 600;
 
 interface Errors {
   email?: string;
@@ -36,10 +36,21 @@ export default function Login() {
     if (Object.keys(next).length) return;
 
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, MOCK_AUTH_DELAY_MS));
-    // PublicOnlyRoute redirects (to the originally requested page or /dashboard).
-    login(email);
-    toast.success('Logged in successfully');
+    try {
+      const user = await login(email.trim(), password);
+      // PublicOnlyRoute now redirects (to ?redirect= or /dashboard).
+      toast.success(`Welcome back, ${user.email.split('@')[0]}!`);
+    } catch (err) {
+      setSubmitting(false);
+      if (err instanceof ApiError && err.status === 401) {
+        setErrors({ password: 'Invalid email or password.' });
+        toast.error('Invalid email or password');
+      } else if (err instanceof ApiError && err.status === 422 && Object.keys(err.fieldErrors).length) {
+        setErrors({ email: err.fieldErrors.email, password: err.fieldErrors.password });
+      } else {
+        toast.error(err instanceof Error ? err.message : 'Could not log you in.');
+      }
+    }
   };
 
   return (
@@ -49,7 +60,7 @@ export default function Login() {
       footer={
         <>
           Don't have an account?{' '}
-          <Link to="/register" state={location.state} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+          <Link to={{ pathname: '/register', search: location.search }} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
             Sign up
           </Link>
         </>

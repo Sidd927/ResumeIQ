@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 
-import { uploadResume, validateResumeFile } from '../api/mockApi';
+import { uploadResume, validateResumeFile } from '../api';
 import { useToast } from '../hooks/useToast';
 import { cn } from '../lib/cn';
 import { formatFileSize } from '../lib/format';
@@ -10,7 +10,8 @@ import LoadingSpinner from './ui/LoadingSpinner';
 
 type UploadState =
   | { status: 'empty' }
-  | { status: 'processing'; file: File }
+  | { status: 'uploading'; file: File; progress: number }
+  | { status: 'parsing'; file: File }
   | { status: 'parsed'; file: File; resume: ResumeResponse };
 
 interface ResumeUploadProps {
@@ -23,7 +24,8 @@ const ACCEPT =
 
 /**
  * Drag-and-drop resume picker.
- * States: empty → processing (mock 1.5s parse) → parsed. Validates type/size up front.
+ * States: empty → uploading (real byte progress) → parsing (server-side) → parsed.
+ * Type/size are validated BEFORE anything is sent.
  */
 export default function ResumeUpload({ onChange }: ResumeUploadProps) {
   const toast = useToast();
@@ -42,18 +44,25 @@ export default function ResumeUpload({ onChange }: ResumeUploadProps) {
     }
     setError(null);
     const id = ++requestId.current;
-    setState({ status: 'processing', file });
+    setState({ status: 'uploading', file, progress: 0 });
     onChange(null);
     try {
-      const resume = await uploadResume(file);
+      const resume = await uploadResume(file, {
+        onUploadProgress: (fraction) => {
+          if (id !== requestId.current) return;
+          // Once every byte is sent, the server is parsing (pdfplumber + spaCy).
+          setState(fraction >= 1 ? { status: 'parsing', file } : { status: 'uploading', file, progress: fraction });
+        },
+      });
       if (id !== requestId.current) return; // removed or replaced while parsing
       setState({ status: 'parsed', file, resume });
       onChange(resume);
-      toast.success('Resume uploaded and parsed');
+      const skills = resume.parsed_json?.skills.length ?? 0;
+      toast.success(`Resume parsed successfully — ${skills} skill${skills === 1 ? '' : 's'} identified`);
     } catch (err) {
       if (id !== requestId.current) return;
       setState({ status: 'empty' });
-      setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+      setError(err instanceof Error ? `Failed to parse resume: ${err.message}` : 'Upload failed. Please try again.');
     }
   };
 
@@ -101,16 +110,21 @@ export default function ResumeUpload({ onChange }: ResumeUploadProps) {
             <p className="truncate text-sm font-medium text-gray-900" title={file.name}>
               {file.name}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500" aria-live="polite">
               {formatFileSize(file.size)}
-              {state.status === 'processing' && ' · Parsing…'}
-              {state.status === 'parsed' && ' · Parsed'}
+              {state.status === 'uploading' && ` · Uploading… ${Math.round(state.progress * 100)}%`}
+              {state.status === 'parsing' && ' · Parsing…'}
+              {state.status === 'parsed' && ' · Done ✓'}
             </p>
           </div>
-          {state.status === 'processing' ? (
-            <LoadingSpinner size="sm" label="Parsing resume" className="mx-2 text-blue-600" />
-          ) : (
+          {state.status === 'parsed' ? (
             <CheckCircleIcon className="mx-1 h-5 w-5 text-green-600" />
+          ) : (
+            <LoadingSpinner
+              size="sm"
+              label={state.status === 'uploading' ? 'Uploading resume' : 'Parsing resume'}
+              className="mx-2 text-blue-600"
+            />
           )}
           <button
             type="button"
@@ -122,7 +136,15 @@ export default function ResumeUpload({ onChange }: ResumeUploadProps) {
           </button>
         </div>
 
-        {state.status === 'processing' && (
+        {state.status === 'uploading' && (
+          <div className="h-1 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
+            <div
+              className="h-full rounded-full bg-blue-600 transition-[width] duration-200"
+              style={{ width: `${Math.max(4, state.progress * 100)}%` }}
+            />
+          </div>
+        )}
+        {state.status === 'parsing' && (
           <div className="overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
             <div className="h-1 w-1/3 animate-indeterminate rounded-full bg-blue-600" />
           </div>
@@ -136,8 +158,8 @@ export default function ResumeUpload({ onChange }: ResumeUploadProps) {
             </p>
             <dl className="mt-3 space-y-1.5 text-sm">
               {[
-                ['Name', parsed.contact_info.name],
-                ['Email', parsed.contact_info.email],
+                ['Name', parsed.contact_info.name ?? 'Not found'],
+                ['Email', parsed.contact_info.email ?? 'Not found'],
                 ['Skills found', String(parsed.skills.length)],
               ].map(([label, value]) => (
                 <div key={label} className="flex items-baseline justify-between gap-4">

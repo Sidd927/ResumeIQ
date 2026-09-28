@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 
 import { buttonClasses, cardClasses } from '../components/ui/button';
 import EmptyState from '../components/ui/EmptyState';
+import { HistoryCardSkeleton } from '../components/ui/Skeleton';
 import { AlertIcon, ArrowRightIcon, ClockIcon } from '../components/ui/icons';
 import { useHistory } from '../hooks/useHistory';
 import { cn } from '../lib/cn';
-import { formatDate, formatTime } from '../lib/format';
+import { formatDate, formatRelativeTime, formatTime } from '../lib/format';
 import { getScoreBand } from '../lib/score';
 import { SIGNALS, toPercent } from '../lib/signals';
 import type { JobDescriptionResponse, MatchResponse } from '../types';
@@ -57,8 +58,8 @@ function HistoryCard({ match, job }: { match: MatchResponse; job: JobDescription
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-gray-900 group-hover:text-blue-700">{title}</p>
           <p className="mt-1 text-xs text-gray-500">
-            <time dateTime={match.created_at}>
-              {formatDate(match.created_at)} · {formatTime(match.created_at)}
+            <time dateTime={match.created_at} title={`${formatDate(match.created_at)} · ${formatTime(match.created_at)}`}>
+              {formatRelativeTime(match.created_at)}
             </time>
             <span className="mx-1.5 text-gray-300">•</span>
             <span className={missing ? 'text-red-600' : 'text-green-700'}>
@@ -92,25 +93,9 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
   );
 }
 
-function HistorySkeleton() {
-  return (
-    <ul className="space-y-3" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <li key={i} className={cn(cardClasses, 'flex animate-pulse items-center gap-6 p-5')}>
-          <div className="h-14 w-14 rounded-xl bg-gray-100" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-1/2 rounded bg-gray-100" />
-            <div className="h-3 w-1/3 rounded bg-gray-100" />
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export default function History() {
   useDocumentTitle('Match history');
-  const { matches, jobs, loading, error } = useHistory();
+  const { matches, jobs, loading, error, reload } = useHistory();
 
   const best = matches.reduce<MatchResponse | null>((b, m) => (!b || m.composite_score > b.composite_score ? m : b), null);
   const average = matches.length ? matches.reduce((sum, m) => sum + m.composite_score, 0) / matches.length : 0;
@@ -133,18 +118,27 @@ export default function History() {
           <span role="status" className="sr-only">
             Loading history
           </span>
-          <HistorySkeleton />
+          <ul className="space-y-3">
+            {[0, 1, 2, 3].map((i) => (
+              <HistoryCardSkeleton key={i} />
+            ))}
+          </ul>
         </>
       ) : error ? (
         <div className={cardClasses}>
-          <EmptyState icon={<AlertIcon className="h-6 w-6" />} title="Couldn't load your history" description={error} />
+          <EmptyState
+            icon={<AlertIcon className="h-6 w-6" />}
+            title="Couldn't load your history"
+            description={error}
+            action={{ label: 'Try again', onClick: reload }}
+          />
         </div>
       ) : matches.length === 0 ? (
         <div className={cardClasses}>
           <EmptyState
             icon={<ClockIcon className="h-6 w-6" />}
             title="No matches yet"
-            description="Every analysis you run is saved here so you can compare roles and track how your resume improves."
+            description="No matches yet. Upload a resume and job description to get started."
             action={{ label: 'Run your first match', to: '/dashboard' }}
           />
         </div>

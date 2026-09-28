@@ -12,7 +12,11 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 7
-    backend_cors_origins: str = "http://localhost:5173"
+    # Comma-separated. Defaults cover local Vite dev (5173), `vite preview` (4173)
+    # and an alternate dev port (3000). Set the real frontend URL in production.
+    backend_cors_origins: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://localhost:3000"
+    )
     spacy_model: str = "en_core_web_sm"
     embedding_model: str = "all-MiniLM-L6-v2"
     anthropic_api_key: str | None = None

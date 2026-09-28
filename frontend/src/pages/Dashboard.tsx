@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { createJobDescription, runMatch } from '../api/mockApi';
+import { createJobDescription, runMatch } from '../api';
 import JDInput, { MIN_JD_LENGTH } from '../components/JDInput';
+import JobPreview from '../components/JobPreview';
 import MissingSkills from '../components/MissingSkills';
 import ResumePreview from '../components/ResumePreview';
 import ResumeUpload from '../components/ResumeUpload';
@@ -27,27 +28,41 @@ interface Result {
 }
 
 const ANALYSIS_STEPS = [
-  'Extracting requirements from the job description',
-  'Comparing your experience with semantic embeddings',
-  'Computing the 4-signal match score',
+  'Parsing the job description',
+  'Analyzing skill match',
+  'Computing semantic similarity',
+  'Weighing title & recency',
+  'Generating results',
 ] as const;
-const STEP_INTERVAL_MS = 650;
+const STEP_INTERVAL_MS = 1100;
+/** After this long, explain that the first run loads the language model. */
+const SLOW_HINT_AFTER_MS = 7000;
 
-/** Step-by-step progress shown while the (mock) scoring engine runs. */
+/**
+ * Staged progress shown while the scoring engine runs. The stages are timed,
+ * not reported by the server — their job is to show that work is happening
+ * (the first match on a cold server loads the embedding model: 5–30 s).
+ */
 function AnalysisProgress() {
   const [step, setStep] = useState(0);
+  const [slow, setSlow] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setStep((s) => Math.min(s + 1, ANALYSIS_STEPS.length - 1)), STEP_INTERVAL_MS);
-    return () => clearInterval(timer);
+    const slowTimer = setTimeout(() => setSlow(true), SLOW_HINT_AFTER_MS);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(slowTimer);
+    };
   }, []);
 
   return (
-    <div className={cn(cardClasses, 'flex flex-col items-center px-6 py-16 text-center')} aria-live="polite">
+    <div className={cn(cardClasses, 'flex flex-col items-center px-6 py-14 text-center')} aria-live="polite">
       <LoadingSpinner size="lg" label={null} className="text-blue-600" />
-      <p className="mt-6 text-base font-semibold text-gray-900">
-        Analyzing your resume against the job description...
-      </p>
+      <p className="mt-6 text-base font-semibold text-gray-900">Analyzing your resume...</p>
+      <div className="mt-4 h-1 w-full max-w-sm overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
+        <div className="h-full w-1/3 animate-indeterminate rounded-full bg-blue-600" />
+      </div>
       <ol className="mt-6 w-full max-w-sm space-y-3 text-left">
         {ANALYSIS_STEPS.map((label, i) => {
           const done = i < step;
@@ -64,11 +79,18 @@ function AnalysisProgress() {
               </span>
               <span className={cn('transition-colors', done ? 'text-gray-500' : active ? 'font-medium text-gray-900' : 'text-gray-400')}>
                 {label}
+                {active && '…'}
               </span>
             </li>
           );
         })}
       </ol>
+      {slow && (
+        <p className="mt-6 max-w-sm animate-fade-in-up text-xs leading-5 text-gray-500">
+          Still working — the first analysis loads the language model on the server, which can take up to 30 seconds.
+          Later analyses are much faster.
+        </p>
+      )}
     </div>
   );
 }
@@ -125,7 +147,7 @@ export default function Dashboard() {
       const match = await runMatch({ resume_id: resume.id, job_id: job.id });
       setResult({ match, job, resume });
       setPhase('done');
-      toast.success('Match complete');
+      toast.success(`Match analysis complete — Score: ${match.composite_score.toFixed(1)}/100`);
     } catch (err) {
       setPhase('idle');
       toast.error(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
@@ -212,6 +234,9 @@ export default function Dashboard() {
               </div>
               <ScoreBreakdown match={result.match} />
               <MissingSkills missingSkills={result.match.missing_skills} jobDescription={result.job.parsed_json} />
+              {result.job.parsed_json && (
+                <JobPreview job={result.job.parsed_json} missingSkills={result.match.missing_skills} />
+              )}
               {result.resume.parsed_json && <ResumePreview resume={result.resume.parsed_json} />}
             </div>
           )}

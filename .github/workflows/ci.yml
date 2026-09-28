@@ -83,5 +83,7 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Unit tests (API client, auth, mock toggle)
+        run: npm test
       - name: Build
         run: npm run build

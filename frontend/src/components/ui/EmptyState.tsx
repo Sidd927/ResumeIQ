@@ -8,7 +8,8 @@ interface EmptyStateProps {
   icon: ReactNode;
   title: string;
   description?: string;
-  action?: { label: string; to: string };
+  /** A link (`to`) or a button (`onClick`, e.g. "Try again"). */
+  action?: { label: string; to: string } | { label: string; onClick: () => void };
   className?: string;
 }
 
@@ -24,11 +25,16 @@ export default function EmptyState({ icon, title, description, action, className
       </div>
       <h3 className="text-base font-semibold text-gray-900">{title}</h3>
       {description && <p className="mt-1.5 max-w-sm text-sm leading-6 text-gray-500">{description}</p>}
-      {action && (
-        <Link to={action.to} className={buttonClasses('primary', 'md', 'mt-6')}>
-          {action.label}
-        </Link>
-      )}
+      {action &&
+        ('to' in action ? (
+          <Link to={action.to} className={buttonClasses('primary', 'md', 'mt-6')}>
+            {action.label}
+          </Link>
+        ) : (
+          <button type="button" onClick={action.onClick} className={buttonClasses('secondary', 'md', 'mt-6')}>
+            {action.label}
+          </button>
+        ))}
     </div>
   );
 }

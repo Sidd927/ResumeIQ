@@ -1,101 +1,63 @@
 /**
- * Mock auth (Phase 1). State lives in localStorage and is exposed through
- * useSyncExternalStore, so every component calling useAuth() — navbar, route
- * guards, pages — re-renders together without a Context provider. Changes in
- * other tabs are picked up via the `storage` event.
+ * React binding for the auth store (src/stores/authStore.ts).
  *
- * Phase 3 replaces login/logout bodies with real JWT calls; the hook's public
- * shape stays the same.
+ * login/register call the API (real or mock, via the barrel), store the token
+ * pair, and return the user decoded from the JWT. Callers don't navigate —
+ * PublicOnlyRoute performs the single post-login redirect.
  */
 import { useCallback, useSyncExternalStore } from 'react';
 
-export interface MockUser {
-  email: string;
-}
-
-interface AuthSnapshot {
-  user: MockUser | null;
-  /** True right after an explicit logout, so guards send the user home instead of to /login. */
-  justLoggedOut: boolean;
-}
-
-const KEYS = { flag: 'isLoggedIn', email: 'resumeiq_user_email' } as const;
-const DEFAULT_EMAIL = 'siddhant@example.com';
-
-const listeners = new Set<() => void>();
-let justLoggedOut = false;
-let snapshot: AuthSnapshot = readSnapshot();
-
-function readSnapshot(): AuthSnapshot {
-  const loggedIn = localStorage.getItem(KEYS.flag) === 'true';
-  const email = localStorage.getItem(KEYS.email) ?? DEFAULT_EMAIL;
-  return { user: loggedIn ? { email } : null, justLoggedOut };
-}
-
-function emit(): void {
-  snapshot = readSnapshot();
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === KEYS.flag || e.key === KEYS.email) emit();
-  };
-  window.addEventListener('storage', onStorage);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener('storage', onStorage);
-  };
-}
-
-function getSnapshot(): AuthSnapshot {
-  return snapshot;
-}
+import { loginUser, registerUser } from '../api';
+import {
+  clearLogoutReason,
+  endSession,
+  getSnapshot,
+  startSession,
+  subscribe,
+  type AuthUser,
+  type LogoutReason,
+} from '../stores/authStore';
 
 export interface UseAuth {
   isLoggedIn: boolean;
-  user: MockUser | null;
-  justLoggedOut: boolean;
-  login: (email: string) => MockUser;
+  user: AuthUser | null;
+  logoutReason: LogoutReason;
+  /** Throws ApiError (401 on bad credentials). */
+  login: (email: string, password: string) => Promise<AuthUser>;
+  /** Creates the account, then logs in. Throws ApiError (409 if the email is taken, 422 on validation). */
+  register: (email: string, password: string) => Promise<AuthUser>;
   logout: () => void;
-  clearLogoutFlag: () => void;
+  clearLogoutReason: () => void;
+}
+
+async function signIn(email: string, password: string): Promise<AuthUser> {
+  const tokens = await loginUser(email, password);
+  const user = startSession(tokens.access_token, tokens.refresh_token);
+  if (!user) throw new Error('Received an unreadable session token.');
+  return user;
 }
 
 export function useAuth(): UseAuth {
-  const { user, justLoggedOut: loggedOutFlag } = useSyncExternalStore(subscribe, getSnapshot);
+  const { user, logoutReason } = useSyncExternalStore(subscribe, getSnapshot);
 
-  const login = useCallback((email: string): MockUser => {
-    const normalized = email.trim().toLowerCase() || DEFAULT_EMAIL;
-    localStorage.setItem(KEYS.flag, 'true');
-    localStorage.setItem(KEYS.email, normalized);
-    justLoggedOut = false;
-    emit();
-    return { email: normalized };
+  const login = useCallback((email: string, password: string) => signIn(email, password), []);
+
+  const register = useCallback(async (email: string, password: string) => {
+    await registerUser(email, password);
+    return signIn(email, password); // the backend's register doesn't issue tokens
   }, []);
 
-  // Clearing the flag re-renders the ProtectedRoute the user is on, which
-  // redirects to the landing page (see justLoggedOut). No navigate() call is
-  // needed here, which avoids two competing redirects.
-  const logout = useCallback((): void => {
-    localStorage.removeItem(KEYS.flag);
-    localStorage.removeItem(KEYS.email);
-    justLoggedOut = true;
-    emit();
-  }, []);
-
-  const clearLogoutFlag = useCallback((): void => {
-    if (!justLoggedOut) return;
-    justLoggedOut = false;
-    emit();
-  }, []);
+  // Clearing the session re-renders the current ProtectedRoute, which sends
+  // the user home (logoutReason "manual"). No navigate() call needed.
+  const logout = useCallback(() => endSession('manual'), []);
 
   return {
     isLoggedIn: user !== null,
     user,
-    justLoggedOut: loggedOutFlag,
+    logoutReason,
     login,
+    register,
     logout,
-    clearLogoutFlag,
+    clearLogoutReason,
   };
 }

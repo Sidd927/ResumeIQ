@@ -38,3 +38,26 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+const relativeFormatter = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' });
+const RELATIVE_UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+  ['year', 365 * 24 * 3600],
+  ['month', 30 * 24 * 3600],
+  ['week', 7 * 24 * 3600],
+  ['day', 24 * 3600],
+  ['hour', 3600],
+  ['minute', 60],
+];
+
+/** ISO timestamp → "just now" / "5 minutes ago" / "yesterday" / "3 weeks ago". */
+export function formatRelativeTime(iso: string, nowMs: number = Date.now()): string {
+  const seconds = (Date.parse(iso) - nowMs) / 1000;
+  if (Number.isNaN(seconds)) return '';
+  if (Math.abs(seconds) < 45) return 'just now';
+  for (const [unit, size] of RELATIVE_UNITS) {
+    if (Math.abs(seconds) >= size || unit === 'minute') {
+      return relativeFormatter.format(Math.round(seconds / size), unit);
+    }
+  }
+  return 'just now';
+}
