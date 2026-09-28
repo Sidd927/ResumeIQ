@@ -172,7 +172,7 @@ Each sub-score is in `[0, 1]` and implemented as an independently unit-tested fu
 ## Roadmap
 
 - [x] **Phase 0** — Scaffold, CI, migrations
-- [ ] **Phase 1** — Frontend shell with mock data
+- [x] **Phase 1** — Frontend shell with mock data
 - [ ] **Phase 2** — Parsing + scoring engine + API
 - [ ] **Phase 3** — Wire frontend ↔ backend, auth, DB
 - [ ] **Phase 4** — Deploy, coverage, polish

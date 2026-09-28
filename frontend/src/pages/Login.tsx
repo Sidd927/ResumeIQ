@@ -1,0 +1,99 @@
+import { useState, type FormEvent } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
+import AuthLayout from '../components/layout/AuthLayout';
+import { buttonClasses } from '../components/ui/button';
+import FormField from '../components/ui/FormField';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MOCK_AUTH_DELAY_MS = 600;
+
+interface Errors {
+  email?: string;
+  password?: string;
+}
+
+export default function Login() {
+  useDocumentTitle('Log in');
+  const { login } = useAuth();
+  const toast = useToast();
+  const location = useLocation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const next: Errors = {};
+    if (!EMAIL_RE.test(email.trim())) next.email = 'Enter a valid email address.';
+    if (!password) next.password = 'Enter your password.';
+    setErrors(next);
+    if (Object.keys(next).length) return;
+
+    setSubmitting(true);
+    await new Promise((r) => setTimeout(r, MOCK_AUTH_DELAY_MS));
+    // PublicOnlyRoute redirects (to the originally requested page or /dashboard).
+    login(email);
+    toast.success('Logged in successfully');
+  };
+
+  return (
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Log in to analyze resumes and view your match history."
+      footer={
+        <>
+          Don't have an account?{' '}
+          <Link to="/register" state={location.state} className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+            Sign up
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        <FormField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErrors((prev) => ({ ...prev, email: undefined }));
+          }}
+          error={errors.email}
+          autoFocus
+        />
+        <FormField
+          id="password"
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setErrors((prev) => ({ ...prev, password: undefined }));
+          }}
+          error={errors.password}
+        />
+        <button type="submit" disabled={submitting} className={buttonClasses('primary', 'md', 'mt-2 w-full')}>
+          {submitting ? (
+            <>
+              <LoadingSpinner size="sm" label={null} />
+              Logging in…
+            </>
+          ) : (
+            'Log In'
+          )}
+        </button>
+      </form>
+    </AuthLayout>
+  );
+}
