@@ -1,0 +1,1026 @@
+{
+  "version": "0.1.0",
+  "skills": [
+    {
+      "canonical": "Python",
+      "synonyms": [
+        "python",
+        "python3",
+        "python 3",
+        "py"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "JavaScript",
+      "synonyms": [
+        "javascript",
+        "js",
+        "ecmascript",
+        "es6",
+        "es2015+"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "TypeScript",
+      "synonyms": [
+        "typescript",
+        "ts"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Java",
+      "synonyms": [
+        "java",
+        "java 8",
+        "java 11",
+        "java 17",
+        "jdk",
+        "j2ee"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "C++",
+      "synonyms": [
+        "c++",
+        "cpp",
+        "c plus plus",
+        "cplusplus"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "C",
+      "synonyms": [
+        "c",
+        "ansi c",
+        "c99",
+        "c11"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Go",
+      "synonyms": [
+        "go",
+        "golang"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Rust",
+      "synonyms": [
+        "rust",
+        "rustlang"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Ruby",
+      "synonyms": [
+        "ruby"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "C#",
+      "synonyms": [
+        "c#",
+        "csharp",
+        "c sharp"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "PHP",
+      "synonyms": [
+        "php",
+        "php7",
+        "php8"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Swift",
+      "synonyms": [
+        "swift",
+        "swiftui"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Kotlin",
+      "synonyms": [
+        "kotlin"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "R",
+      "synonyms": [
+        "r",
+        "r language",
+        "rstats",
+        "r programming"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "SQL",
+      "synonyms": [
+        "sql",
+        "structured query language",
+        "t-sql",
+        "pl/sql",
+        "ansi sql"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Scala",
+      "synonyms": [
+        "scala"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Bash",
+      "synonyms": [
+        "bash",
+        "shell scripting",
+        "shell",
+        "sh",
+        "zsh"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "MATLAB",
+      "synonyms": [
+        "matlab"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "Dart",
+      "synonyms": [
+        "dart"
+      ],
+      "category": "programming_languages"
+    },
+    {
+      "canonical": "React",
+      "synonyms": [
+        "react",
+        "react.js",
+        "reactjs",
+        "react js"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Angular",
+      "synonyms": [
+        "angular",
+        "angular.js",
+        "angularjs",
+        "angular 2+"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Vue",
+      "synonyms": [
+        "vue",
+        "vue.js",
+        "vuejs",
+        "vue 3"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Next.js",
+      "synonyms": [
+        "next.js",
+        "nextjs",
+        "next js"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Svelte",
+      "synonyms": [
+        "svelte",
+        "sveltekit"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "TailwindCSS",
+      "synonyms": [
+        "tailwindcss",
+        "tailwind",
+        "tailwind css"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "HTML",
+      "synonyms": [
+        "html",
+        "html5"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "CSS",
+      "synonyms": [
+        "css",
+        "css3"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "SASS",
+      "synonyms": [
+        "sass",
+        "scss"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Redux",
+      "synonyms": [
+        "redux",
+        "redux toolkit",
+        "rtk"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Webpack",
+      "synonyms": [
+        "webpack"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Vite",
+      "synonyms": [
+        "vite",
+        "vitejs"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "jQuery",
+      "synonyms": [
+        "jquery"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Bootstrap",
+      "synonyms": [
+        "bootstrap"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "React Native",
+      "synonyms": [
+        "react native",
+        "react-native"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Flutter",
+      "synonyms": [
+        "flutter"
+      ],
+      "category": "frontend"
+    },
+    {
+      "canonical": "Node.js",
+      "synonyms": [
+        "node.js",
+        "nodejs",
+        "node js",
+        "node"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Express",
+      "synonyms": [
+        "express",
+        "express.js",
+        "expressjs"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Django",
+      "synonyms": [
+        "django",
+        "django rest framework",
+        "drf"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Flask",
+      "synonyms": [
+        "flask"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "FastAPI",
+      "synonyms": [
+        "fastapi",
+        "fast api"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Spring Boot",
+      "synonyms": [
+        "spring boot",
+        "springboot",
+        "spring",
+        "spring framework"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": ".NET",
+      "synonyms": [
+        ".net",
+        "dotnet",
+        "asp.net",
+        ".net core",
+        "asp.net core"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Ruby on Rails",
+      "synonyms": [
+        "ruby on rails",
+        "rails",
+        "ror"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Laravel",
+      "synonyms": [
+        "laravel"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "NestJS",
+      "synonyms": [
+        "nestjs",
+        "nest.js"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "GraphQL",
+      "synonyms": [
+        "graphql",
+        "apollo graphql"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "REST APIs",
+      "synonyms": [
+        "rest",
+        "rest api",
+        "rest apis",
+        "restful",
+        "restful apis"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "gRPC",
+      "synonyms": [
+        "grpc",
+        "protocol buffers",
+        "protobuf"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "Microservices",
+      "synonyms": [
+        "microservices",
+        "microservice architecture",
+        "service-oriented architecture",
+        "soa"
+      ],
+      "category": "backend"
+    },
+    {
+      "canonical": "TensorFlow",
+      "synonyms": [
+        "tensorflow",
+        "tf",
+        "tensorflow 2"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "PyTorch",
+      "synonyms": [
+        "pytorch",
+        "torch"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Scikit-learn",
+      "synonyms": [
+        "scikit-learn",
+        "sklearn",
+        "scikit learn"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Pandas",
+      "synonyms": [
+        "pandas"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "NumPy",
+      "synonyms": [
+        "numpy"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Keras",
+      "synonyms": [
+        "keras"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Spark",
+      "synonyms": [
+        "spark",
+        "apache spark",
+        "pyspark",
+        "spark sql"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Hadoop",
+      "synonyms": [
+        "hadoop",
+        "hdfs",
+        "mapreduce"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Machine Learning",
+      "synonyms": [
+        "machine learning",
+        "ml"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Deep Learning",
+      "synonyms": [
+        "deep learning",
+        "dl",
+        "neural networks"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Natural Language Processing",
+      "synonyms": [
+        "natural language processing",
+        "nlp"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Computer Vision",
+      "synonyms": [
+        "computer vision",
+        "cv",
+        "image processing"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Hugging Face Transformers",
+      "synonyms": [
+        "hugging face",
+        "huggingface",
+        "transformers"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "LLMs",
+      "synonyms": [
+        "llm",
+        "llms",
+        "large language models",
+        "generative ai",
+        "genai"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "spaCy",
+      "synonyms": [
+        "spacy"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "OpenCV",
+      "synonyms": [
+        "opencv"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Matplotlib",
+      "synonyms": [
+        "matplotlib"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Jupyter",
+      "synonyms": [
+        "jupyter",
+        "jupyter notebook",
+        "jupyterlab"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Airflow",
+      "synonyms": [
+        "airflow",
+        "apache airflow"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Kafka",
+      "synonyms": [
+        "kafka",
+        "apache kafka"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "dbt",
+      "synonyms": [
+        "dbt",
+        "data build tool"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Tableau",
+      "synonyms": [
+        "tableau"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Power BI",
+      "synonyms": [
+        "power bi",
+        "powerbi"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "Statistics",
+      "synonyms": [
+        "statistics",
+        "statistical analysis",
+        "statistical modeling"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "MLOps",
+      "synonyms": [
+        "mlops",
+        "ml ops",
+        "mlflow"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "ETL",
+      "synonyms": [
+        "etl",
+        "elt",
+        "data pipelines"
+      ],
+      "category": "data_ml"
+    },
+    {
+      "canonical": "AWS",
+      "synonyms": [
+        "aws",
+        "amazon web services",
+        "ec2",
+        "s3",
+        "lambda",
+        "aws lambda"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Azure",
+      "synonyms": [
+        "azure",
+        "microsoft azure"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "GCP",
+      "synonyms": [
+        "gcp",
+        "google cloud",
+        "google cloud platform"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Docker",
+      "synonyms": [
+        "docker",
+        "containers",
+        "containerization",
+        "dockerfile"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Kubernetes",
+      "synonyms": [
+        "kubernetes",
+        "k8s",
+        "eks",
+        "gke",
+        "aks"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "CI/CD",
+      "synonyms": [
+        "ci/cd",
+        "cicd",
+        "ci cd",
+        "continuous integration",
+        "continuous delivery",
+        "continuous deployment"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Terraform",
+      "synonyms": [
+        "terraform",
+        "hcl"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Jenkins",
+      "synonyms": [
+        "jenkins"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "GitHub Actions",
+      "synonyms": [
+        "github actions",
+        "gh actions"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "GitLab CI",
+      "synonyms": [
+        "gitlab ci",
+        "gitlab-ci",
+        "gitlab ci/cd"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Ansible",
+      "synonyms": [
+        "ansible"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Helm",
+      "synonyms": [
+        "helm",
+        "helm charts"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Linux",
+      "synonyms": [
+        "linux",
+        "unix",
+        "ubuntu",
+        "centos",
+        "rhel"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Nginx",
+      "synonyms": [
+        "nginx"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Prometheus",
+      "synonyms": [
+        "prometheus"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Grafana",
+      "synonyms": [
+        "grafana"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Serverless",
+      "synonyms": [
+        "serverless",
+        "faas"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "Infrastructure as Code",
+      "synonyms": [
+        "infrastructure as code",
+        "iac",
+        "cloudformation"
+      ],
+      "category": "devops_cloud"
+    },
+    {
+      "canonical": "PostgreSQL",
+      "synonyms": [
+        "postgresql",
+        "postgres",
+        "psql",
+        "pg"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "MySQL",
+      "synonyms": [
+        "mysql",
+        "mariadb"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "MongoDB",
+      "synonyms": [
+        "mongodb",
+        "mongo"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Redis",
+      "synonyms": [
+        "redis"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Elasticsearch",
+      "synonyms": [
+        "elasticsearch",
+        "elastic search",
+        "elk",
+        "opensearch"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "DynamoDB",
+      "synonyms": [
+        "dynamodb",
+        "dynamo db"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "SQLite",
+      "synonyms": [
+        "sqlite",
+        "sqlite3"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Oracle Database",
+      "synonyms": [
+        "oracle",
+        "oracle db",
+        "oracle database"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Microsoft SQL Server",
+      "synonyms": [
+        "sql server",
+        "mssql",
+        "ms sql"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Cassandra",
+      "synonyms": [
+        "cassandra",
+        "apache cassandra"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Snowflake",
+      "synonyms": [
+        "snowflake"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "BigQuery",
+      "synonyms": [
+        "bigquery",
+        "big query"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Firebase",
+      "synonyms": [
+        "firebase",
+        "firestore"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "SQLAlchemy",
+      "synonyms": [
+        "sqlalchemy"
+      ],
+      "category": "databases"
+    },
+    {
+      "canonical": "Git",
+      "synonyms": [
+        "git",
+        "github",
+        "gitlab",
+        "bitbucket",
+        "version control"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Agile",
+      "synonyms": [
+        "agile",
+        "scrum",
+        "kanban"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Unit Testing",
+      "synonyms": [
+        "unit testing",
+        "unit tests",
+        "tdd",
+        "test-driven development"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Pytest",
+      "synonyms": [
+        "pytest"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Jest",
+      "synonyms": [
+        "jest"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Cypress",
+      "synonyms": [
+        "cypress"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Selenium",
+      "synonyms": [
+        "selenium"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Jira",
+      "synonyms": [
+        "jira"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "System Design",
+      "synonyms": [
+        "system design",
+        "distributed systems",
+        "scalability"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "Data Structures & Algorithms",
+      "synonyms": [
+        "data structures",
+        "algorithms",
+        "dsa"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "OAuth",
+      "synonyms": [
+        "oauth",
+        "oauth2",
+        "oauth 2.0",
+        "openid connect",
+        "oidc"
+      ],
+      "category": "tools_practices"
+    },
+    {
+      "canonical": "JWT",
+      "synonyms": [
+        "jwt",
+        "json web token",
+        "json web tokens"
+      ],
+      "category": "tools_practices"
+    }
+  ]
+}
