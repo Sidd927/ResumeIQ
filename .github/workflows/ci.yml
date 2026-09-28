@@ -122,10 +122,25 @@ jobs:
             -e JWT_SECRET_KEY="$(openssl rand -hex 32)" \
             -e DATABASE_URL=postgres://resumeiq:smoke@db:5432/resumeiq \
             resumeiq-api:ci
-          for i in $(seq 1 60); do curl -sf localhost:8000/health && break; sleep 2; done
-          curl -sf localhost:8000/health
-          docker logs api | grep "event=migrations_applied"
-          docker logs api | grep "event=models_preloaded"
+          # Wait for the API to come up (migrations + model preload happen before it listens).
+          healthy=false
+          for i in $(seq 1 60); do
+            if body=$(curl -sf localhost:8000/health) && echo "$body" | grep -q '"status":"healthy"'; then
+              echo "API healthy after ~$((i * 2))s: $body"
+              healthy=true
+              break
+            fi
+            sleep 2
+          done
+          [ "$healthy" = true ] || { echo "::error::API never became healthy"; exit 1; }
+
+          # App logs go to STDERR (Python logging), and `docker logs` replays the
+          # container's stderr on its own stderr — so merge it into the pipe.
+          docker logs api 2>&1 | grep -q "event=migrations_applied" \
+            || { echo "::error::migrations_applied not found in startup logs"; exit 1; }
+          docker logs api 2>&1 | grep -q "event=models_preloaded" \
+            || { echo "::error::models_preloaded not found in startup logs"; exit 1; }
+          echo "Startup verified: migrations applied, models preloaded, /health OK under a 512 MB cap."
       - name: Container logs on failure
         if: failure()
         run: docker logs api || true
