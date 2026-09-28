@@ -21,6 +21,15 @@ export interface TokenResponse {
   token_type: string;
 }
 
+export interface TokenRefresh {
+  refresh_token: string;
+}
+
+export interface AccessTokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
 // === Resume ===
 export interface ResumeResponse {
   id: number;
@@ -31,10 +40,11 @@ export interface ResumeResponse {
   created_at: string;
 }
 
+// Parser output: anything the parser could not find is null / [] (never a crash).
 export interface ParsedResume {
   contact_info: {
-    name: string;
-    email: string;
+    name: string | null;
+    email: string | null;
     phone: string | null;
     location: string | null;
   };
@@ -44,16 +54,18 @@ export interface ParsedResume {
 }
 
 export interface WorkEntry {
-  title: string;
-  company: string;
-  start_date: string;
+  title: string | null;
+  company: string | null;
+  /** "YYYY-MM" or "YYYY" */
+  start_date: string | null;
+  /** null with a start_date = current role */
   end_date: string | null;
   bullets: string[];
 }
 
 export interface EducationEntry {
-  degree: string;
-  institution: string;
+  degree: string | null;
+  institution: string | null;
   year: number | null;
 }
 
@@ -71,7 +83,7 @@ export interface JobDescriptionResponse {
 }
 
 export interface ParsedJobDescription {
-  title: string;
+  title: string | null;
   required_skills: string[];
   preferred_skills: string[];
   experience_level: string | null;

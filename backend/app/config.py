@@ -17,6 +17,16 @@ class Settings(BaseSettings):
     embedding_model: str = "all-MiniLM-L6-v2"
     anthropic_api_key: str | None = None
 
+    # Dev convenience: create missing tables on startup. Set to false wherever
+    # Alembic owns the schema (production), otherwise `alembic upgrade` will
+    # find tables it did not create.
+    auto_create_tables: bool = True
+    max_upload_bytes: int = 5 * 1024 * 1024
+    bcrypt_rounds: int = 12  # tests lower this; 12 is a sane production cost
+    # Load spaCy + the embedding model at startup instead of on the first request
+    # (~5-30 s cold start). Recommended in deployed environments.
+    preload_models: bool = False
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

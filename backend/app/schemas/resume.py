@@ -1,7 +1,7 @@
-from datetime import datetime
-from typing import Any
-
 from pydantic import BaseModel, ConfigDict
+
+from app.schemas.common import UTCDateTime
+from app.schemas.parsed import ParsedResume
 
 
 class ResumeResponse(BaseModel):
@@ -10,6 +10,6 @@ class ResumeResponse(BaseModel):
     id: int
     user_id: int
     raw_text: str
-    parsed_json: dict[str, Any] | None
+    parsed_json: ParsedResume | None
     file_url: str | None
-    created_at: datetime
+    created_at: UTCDateTime

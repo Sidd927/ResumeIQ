@@ -59,7 +59,7 @@ flowchart LR
 
 - Python 3.11+
 - Node.js 20.19+ or 22+
-- Docker (for local Postgres) — optional until Phase 3
+- Docker (for local Postgres) — optional: the backend also runs on SQLite (`DATABASE_URL=sqlite:///./resumeiq_dev.db`)
 
 ### 1. Clone & configure
 
@@ -80,16 +80,28 @@ docker compose up -d db
 cd backend
 python3.11 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
-alembic upgrade head          # needs the database running
-uvicorn app.main:app --reload # → http://localhost:8000/docs
+pip install -r requirements.txt   # includes the pinned spaCy model wheel
+alembic upgrade head              # needs the database running
+uvicorn app.main:app --reload     # → http://localhost:8000/docs
 ```
 
-Run the tests (no database required):
+The sentence-transformer model (~80 MB) downloads to the HuggingFace cache on the first match request (or at boot with `PRELOAD_MODELS=true`).
+
+Run the tests — no database required (SQLite in-memory), real NLP models:
 
 ```bash
-python -m pytest -v
+python -m pytest -v                                             # unit + API tests
+TEST_POSTGRES_URL=postgresql://… python -m pytest -m integration  # PostgreSQL-only tests
 ```
+
+#### Try the API in Swagger (`/docs`)
+
+1. `POST /api/auth/register` → **Try it out** → **Execute** (the demo body is pre-filled)
+2. `POST /api/auth/login` → **Execute** → copy `access_token`
+3. Click **Authorize** (top right), paste the token
+4. `POST /api/resumes` → upload any PDF/DOCX (e.g. `backend/tests/fixtures/sample_resume.pdf`)
+5. `POST /api/jobs` → **Execute** (a sample JD is pre-filled)
+6. `POST /api/match` with the two IDs → 4 sub-scores, composite, missing skills
 
 ### 4. Frontend
 
@@ -146,13 +158,16 @@ resumeiq/
 | POST   | `/api/auth/login`          | `{ email, password }`       | `{ access_token, refresh_token }` |
 | POST   | `/api/auth/refresh`        | `{ refresh_token }`         | `{ access_token }` |
 | POST   | `/api/resumes`             | multipart file (PDF/DOCX)   | `{ resume_id, parsed_json }` |
+| GET    | `/api/resumes/{id}`        | —                           | stored resume + parsed JSON |
 | POST   | `/api/jobs`                | `{ raw_text }`              | `{ job_id, parsed_json }` |
+| GET    | `/api/jobs/{id}`           | —                           | stored JD + parsed JSON |
 | POST   | `/api/match`               | `{ resume_id, job_id }`     | match result with 4 sub-scores |
 | GET    | `/api/match/{id}`          | —                           | match result |
 | GET    | `/api/match/history`       | —                           | list of match results |
 | POST   | `/api/match/{id}/feedback` | —                           | *(stretch)* LLM feedback text |
 
 Plus `GET /health` for liveness. Interactive docs at `/docs` (Swagger) and `/redoc`.
+All `/api/*` routes except register/login/refresh need `Authorization: Bearer <access_token>`; resources belonging to other users return 404.
 
 ## Scoring Algorithm
 
@@ -162,18 +177,18 @@ composite = (0.4 × skill + 0.3 × semantic + 0.2 × recency + 0.1 × completene
 
 | Signal | Weight | How it's computed | Explains |
 |--------|:------:|-------------------|----------|
-| **Skill Match** | 40% | JD required skills vs. resume skills, normalized through the synonym taxonomy (`k8s` = `Kubernetes`) | Explicit missing-skills list |
-| **Semantic Relevance** | 30% | Cosine similarity between resume bullet embeddings and JD requirement-line embeddings | Which requirements are/aren't covered |
-| **Recency & Title** | 20% | Most recent job title vs. posting title + recency-weighted skill presence | Whether relevant experience is current |
-| **Section Completeness** | 10% | Did the parser cleanly extract contact, work history, education, skills? | Which sections are missing/unparseable |
+| **Skill Match** | 40% | `(2·required matched + 1·preferred matched) / (2·required + 1·preferred)`, every skill normalised through the taxonomy first (`k8s` = `Kubernetes`, `ML` = `Machine Learning`) | Missing skills, required first |
+| **Semantic Relevance** | 30% | For each JD requirement line, the best cosine similarity against any resume bullet (all-MiniLM-L6-v2); averaged, then linearly calibrated so 0.15 → 0 and 0.65 → 1 | Which requirements your experience covers |
+| **Title & Recency** | 20% | Mean of (a) most-recent title vs. JD title — role-word overlap × seniority factor (−15% per level under) and (b) recency-weighted skill evidence — each JD skill scores the recency of the latest role that shows it (full within 2 years, then a 2-year half-life) | Whether relevant experience is current |
+| **Section Completeness** | 10% | name 12.5% + email 12.5% + work history 30% + education 20% + ≥3 skills 25% | Which sections the parser could not read |
 
-Each sub-score is in `[0, 1]` and implemented as an independently unit-tested function in `backend/app/services/scorer.py`.
+Each sub-score is in `[0, 1]` and implemented as an independently unit-tested function in `backend/app/services/scorer.py`. `compute_match` is a **pure function**: no database, no I/O, no LLM, and "today" is passed in explicitly — so the same inputs always produce the same scores.
 
 ## Roadmap
 
 - [x] **Phase 0** — Scaffold, CI, migrations
 - [x] **Phase 1** — Frontend shell with mock data
-- [ ] **Phase 2** — Parsing + scoring engine + API
+- [x] **Phase 2** — Parsing + scoring engine + API
 - [ ] **Phase 3** — Wire frontend ↔ backend, auth, DB
 - [ ] **Phase 4** — Deploy, coverage, polish
 - [ ] **Phase 5** — Stretch: Claude feedback, bullet rewriting, trend dashboard

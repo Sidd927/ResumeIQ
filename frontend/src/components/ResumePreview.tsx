@@ -96,12 +96,14 @@ export default function ResumePreview({ resume, className }: { resume: ParsedRes
                   )}
                 />
                 <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                  <p className="text-sm font-semibold text-gray-900">{job.title}</p>
+                  <p className="text-sm font-semibold text-gray-900">{job.title ?? 'Untitled role'}</p>
                   <p className="text-xs text-gray-500 tabular-nums">
-                    {formatMonthYear(job.start_date)} — {formatMonthYear(job.end_date)}
+                    {job.start_date
+                      ? `${formatMonthYear(job.start_date)} — ${formatMonthYear(job.end_date)}`
+                      : 'Dates not found'}
                   </p>
                 </div>
-                <p className="text-sm text-gray-600">{job.company}</p>
+                {job.company && <p className="text-sm text-gray-600">{job.company}</p>}
                 <ul className="mt-2 list-disc space-y-1 pl-4 text-sm leading-6 text-gray-600 marker:text-gray-300">
                   {job.bullets.map((b) => (
                     <li key={b}>{b}</li>
@@ -117,8 +119,8 @@ export default function ResumePreview({ resume, className }: { resume: ParsedRes
             {education.map((ed) => (
               <li key={`${ed.institution}-${ed.degree}`} className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{ed.degree}</p>
-                  <p className="text-sm text-gray-600">{ed.institution}</p>
+                  <p className="text-sm font-semibold text-gray-900">{ed.degree ?? ed.institution}</p>
+                  {ed.degree && ed.institution && <p className="text-sm text-gray-600">{ed.institution}</p>}
                 </div>
                 {ed.year && <p className="text-xs text-gray-500 tabular-nums">{ed.year}</p>}
               </li>

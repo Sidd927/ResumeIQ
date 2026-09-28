@@ -1,0 +1,16 @@
+Senior Full Stack Developer — 3-5 years
+
+We're looking for a Senior Full Stack Developer to build and scale our core product.
+
+What you'll do:
+• Build and maintain scalable web applications using React and Node.js
+• Design and implement RESTful APIs with proper authentication and authorization
+• Write clean, testable code with comprehensive unit and integration tests
+• Deploy and manage applications on AWS using containerized architectures
+• Collaborate with product managers and designers in an agile environment
+
+Required: React, TypeScript, Node.js, PostgreSQL, Docker, AWS, CI/CD, REST APIs
+Nice to have: Python, FastAPI, Redis, GraphQL, Kubernetes
+
+About us:
+We are a Series B startup based in Bengaluru.

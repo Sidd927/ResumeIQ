@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from app import __version__
+
 router = APIRouter(tags=["health"])
 
 
@@ -9,5 +11,5 @@ def health_check() -> dict[str, str]:
     return {
         "status": "healthy",
         "project": "ResumeIQ",
-        "version": "0.1.0",
+        "version": __version__,
     }

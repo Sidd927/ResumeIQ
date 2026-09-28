@@ -1,9 +1,11 @@
-from datetime import datetime
-
 from pydantic import BaseModel, ConfigDict
+
+from app.schemas.common import UTCDateTime
 
 
 class MatchRequest(BaseModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"resume_id": 1, "job_id": 1}]})
+
     resume_id: int
     job_id: int
 
@@ -31,4 +33,4 @@ class MatchResponse(BaseModel):
     composite_score: float
     missing_skills: list[str]
     feedback_text: str | None
-    created_at: datetime
+    created_at: UTCDateTime

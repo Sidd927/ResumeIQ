@@ -156,7 +156,7 @@ export default function History() {
             <Stat
               label="Best match"
               value={best ? best.composite_score.toFixed(1) : '—'}
-              hint={best ? jobs[best.jd_id]?.parsed_json?.title : undefined}
+              hint={(best && jobs[best.jd_id]?.parsed_json?.title) || undefined}
             />
           </dl>
           <ul className="space-y-3">

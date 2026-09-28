@@ -6,12 +6,27 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  HF_HUB_DISABLE_TELEMETRY: "1"
+
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: resumeiq_user
+          POSTGRES_PASSWORD: resumeiq_pass
+          POSTGRES_DB: resumeiq_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U resumeiq_user -d resumeiq_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,14 +34,34 @@ jobs:
           python-version: '3.11'
           cache: pip
           cache-dependency-path: backend/requirements.txt
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-all-MiniLM-L6-v2-v1
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           # CPU-only torch first: avoids pulling ~3 GB of CUDA wheels that CI never uses.
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
-      - name: Run tests
+      - name: Unit + API tests (SQLite, real NLP models)
         run: python -m pytest tests/ -v
+      - name: Integration tests (PostgreSQL)
+        env:
+          TEST_POSTGRES_URL: postgresql://resumeiq_user:resumeiq_pass@localhost:5432/resumeiq_test
+        run: python -m pytest tests/ -m integration -v
+      - name: Migrations apply cleanly and match the models
+        env:
+          DATABASE_URL: postgresql://resumeiq_user:resumeiq_pass@localhost:5432/resumeiq_test
+        run: |
+          python - <<'EOF'
+          from sqlalchemy import create_engine, text
+          with create_engine("postgresql://resumeiq_user:resumeiq_pass@localhost:5432/resumeiq_test").begin() as c:
+              c.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
+          EOF
+          alembic upgrade head
+          alembic check
 
   frontend-typecheck:
     runs-on: ubuntu-latest
@@ -46,5 +81,7 @@ jobs:
         # tsc -b follows the project references in tsconfig.json; plain
         # `tsc --noEmit` on the root config would check zero files.
         run: npm run typecheck
+      - name: Lint
+        run: npm run lint
       - name: Build
         run: npm run build

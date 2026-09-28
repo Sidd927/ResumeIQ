@@ -1,0 +1,27 @@
+Siddhant Patil
+Mumbai, India | siddhant@example.com | +91 98765 43210 | github.com/siddhant
+
+SUMMARY
+Full stack developer who ships production web apps with React and FastAPI.
+
+EXPERIENCE
+Full Stack Developer — TechCorp Solutions
+Jun 2024 – Present
+• Built and deployed microservices using FastAPI and PostgreSQL, handling 10K+ daily requests
+• Developed responsive React dashboards with TypeScript, reducing page load times by 40%
+• Implemented CI/CD pipelines using GitHub Actions, cutting deployment time from 2 hours
+  to 15 minutes
+• Collaborated with a cross-functional team of 8 to deliver features on a 2-week sprint cycle
+
+Software Engineering Intern | DataFlow Analytics | Jan 2023 - May 2024
+• Designed REST APIs serving ML model predictions to 50+ enterprise clients
+• Created data visualization components using Recharts, adopted across 3 product teams
+• Wrote unit and integration tests achieving 85% code coverage on critical services
+
+EDUCATION
+B.Tech Computer Science, Mumbai University | 2021 – 2025 | CGPA: 8.7/10
+
+SKILLS
+Languages: Python, JavaScript, TypeScript, SQL
+Frameworks: React, FastAPI, Tailwind CSS
+Tools: Docker, Git, PostgreSQL, REST APIs, Figma
