@@ -20,7 +20,7 @@ Upload a resume, paste a job posting, and get a 0–100 match score broken into 
 
 ## ✨ Live demo
 
-> **🔗 _Add your Vercel URL here after deploying_** · API docs: `https://<your-api>.onrender.com/docs`
+> **🔗 [resume-iq-beta-henna.vercel.app](https://resume-iq-beta-henna.vercel.app/)** · API docs: [resumeiq-api-l5mb.onrender.com/docs](https://resumeiq-api-l5mb.onrender.com/docs)
 >
 > Runs on free hosting: if the API has been idle it takes **~30–60 s to wake up** on the first request (the app tells you when this is happening). After that, a match takes well under a second.
 
